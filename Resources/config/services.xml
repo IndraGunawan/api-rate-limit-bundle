@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services
+        http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <imports>
+        <import resource="event_listener.xml"/>
+    </imports>
+
+    <parameters>
+        <parameter key="indragunawan_api_rate_limit.service.rate_limit_handler.class">Indragunawan\ApiRateLimitBundle\Service\RateLimitHandler</parameter>
+    </parameters>
+
+    <services>
+        <service id="indragunawan_api_rate_limit.service.rate_limit_handler" class="%indragunawan_api_rate_limit.service.rate_limit_handler.class%" public="false">
+            <argument/>
+            <argument/>
+        </service>
+    </services>
+</container>

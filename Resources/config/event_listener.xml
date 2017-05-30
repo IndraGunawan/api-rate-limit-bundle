@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services
+        http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="indragunawan_api_rate_limit.event_listener.header_modification.class">Indragunawan\ApiRateLimitBundle\EventListener\HeaderModificationListener</parameter>
+        <parameter key="indragunawan_api_rate_limit.event_listener.rate_limit.class">Indragunawan\ApiRateLimitBundle\EventListener\RateLimitListener</parameter>
+    </parameters>
+
+    <services>
+        <service id="indragunawan_api_rate_limit.event_listener.header_modification" class="%indragunawan_api_rate_limit.event_listener.header_modification.class%">
+            <argument/>
+            <argument/>
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="0" />
+        </service>
+
+        <service id="indragunawan_api_rate_limit.event_listener.rate_limit" class="%indragunawan_api_rate_limit.event_listener.rate_limit.class%">
+            <argument/>
+            <argument type="service" id="indragunawan_api_rate_limit.service.rate_limit_handler" />
+            <argument/>
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="0" />
+        </service>
+    </services>
+</container>

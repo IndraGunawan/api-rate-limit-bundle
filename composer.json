@@ -1,0 +1,24 @@
+{
+    "name": "indragunawan/api-rate-limit-bundle",
+    "type": "bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Indra Gunawan",
+            "email": "hello@indra.my.id"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "api-platform/core": "^2.0",
+        "symfony/http-foundation": "^2.7 || ^3.0",
+        "symfony/http-kernel": "^2.7 || ^3.0",
+        "doctrine/cache": "^1.4.2",
+        "doctrine/annotation": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Indragunawan\\ApiRateLimitBundle\\": ""
+        }
+    }
+}
