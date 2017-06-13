@@ -71,9 +71,10 @@ class RateLimitListener
     }
 
     /**
-     * Returns an RateLimitExceededException
+     * Returns an RateLimitExceededException.
      *
      * @param Request $request
+     *
      * @return RateLimitExceededException
      */
     protected function createRateLimitExceededException(Request $request)
