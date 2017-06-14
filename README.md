@@ -47,7 +47,7 @@ Default bundle configuration
 indragunawan_api_rate_limit:
     enabled: true
 
-    # The service that is used to persist class metadata in a cache. The service has to implement the Doctrine\Common\Cache\Cache interface.
+    # The service that is used to persist rate limit metadata. The service has to implement the Doctrine\Common\Cache\Cache interface.
     storage: null
 
     # Response header for rate limit information
@@ -84,4 +84,4 @@ Todo
 License
 -------
 
-This bundle is under the MIT license. See the complete [license](LICENSE)
+This bundle is under the MIT license. See the complete [license](LICENSE.md)
