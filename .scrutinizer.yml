@@ -1,0 +1,14 @@
+filter:
+    excluded_paths: [vendor/*, Tests/*]
+tools:
+    external_code_coverage: true
+    sensiolabs_security_checker: true
+    php_code_coverage: true
+    php_sim: true
+    php_mess_detector: true
+    php_pdepend: true
+    php_analyzer: true
+    php_cpd: true
+    external_code_coverage:
+        timeout: 600
+        runs: 3
