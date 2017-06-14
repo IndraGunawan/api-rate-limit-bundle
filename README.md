@@ -47,7 +47,7 @@ Default bundle configuration
 indragunawan_api_rate_limit:
     enabled: true
 
-    # The service that is used to persist rate limit metadata. The service has to implement the Doctrine\Common\Cache\Cache interface.
+    # The service that is used to persist rate limit metadata. The service has to implement the Doctrine\Common\Cache\Cache interface. If no service id provided then the default storage is Filesystem (location: %kernel.cache_dir%/rate_limit).
     storage: null
 
     # Response header for rate limit information
@@ -66,12 +66,13 @@ indragunawan_api_rate_limit:
     # Exception thrown when rate limit exceeded
     exception:
         status_code: 429
-        message: 'API rate limit exceeded for %s.' #%s will be replace with client IP address
+        message: 'API rate limit exceeded for %s.' # %s will be replace with client IP address
         custom_exception: null
 ```
 
 ### Disable on development
 ```yml
+# app/config/config_dev.yml
 indragunawan_api_rate_limit:
     enabled: false
 ```
