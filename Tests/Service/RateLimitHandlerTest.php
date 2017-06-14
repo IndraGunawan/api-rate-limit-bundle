@@ -21,9 +21,6 @@ class RateLimitHandlerTest extends TestCase
     public function testDisabledApiRateLimit()
     {
         $cache = $this->getMockBuilder(\Doctrine\Common\Cache\RedisCache::class)->getMock();
-        // $decoder->expects($this->any())
-        //     ->method('decode')
-        //     ->will($this->returnValue($request->getContent()));
 
         $throttleConfig = [
             'limit' => 60,

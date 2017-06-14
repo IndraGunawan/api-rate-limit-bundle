@@ -50,11 +50,11 @@ class ConfigurationTest extends TestCase
         $this->assertFalse($config['enabled']);
     }
 
-    /**
-     * @expedtedExceptionMessage Invalid status code "999"
-     */
     public function testInvalidStatusCode()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid status code "999"');
+
         $config = $this->processor->processConfiguration(
             $this->configuration,
             [
