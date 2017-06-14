@@ -20,7 +20,7 @@ class RateLimitHandlerTest extends TestCase
 {
     public function testDisabledApiRateLimit()
     {
-        $cache = $this->getMockBuilder(\Doctrine\Common\Cache\RedisCache::class)->getMock();
+        $storage = $this->getMockBuilder(\Doctrine\Common\Cache\RedisCache::class)->getMock();
 
         $throttleConfig = [
             'limit' => 60,
@@ -30,7 +30,7 @@ class RateLimitHandlerTest extends TestCase
         $request = Request::create('/api/me');
         $request->attributes->set('_api_resource_class', FOO::class);
 
-        $rateLimitHandler = new RateLimitHandler($cache, $throttleConfig);
+        $rateLimitHandler = new RateLimitHandler($storage, $throttleConfig);
         $rateLimitHandler->handle($request);
 
         $this->assertTrue($rateLimitHandler->isEnabled());
@@ -45,8 +45,8 @@ class RateLimitHandlerTest extends TestCase
     {
         $resetTime = gmdate('U');
 
-        $cache = $this->getMockBuilder(\Doctrine\Common\Cache\RedisCache::class)->getMock();
-        $cache->expects($this->once())
+        $storage = $this->getMockBuilder(\Doctrine\Common\Cache\RedisCache::class)->getMock();
+        $storage->expects($this->once())
             ->method('fetch')
             ->will($this->returnValue([
                 'limit' => 60,
@@ -62,7 +62,7 @@ class RateLimitHandlerTest extends TestCase
         $request = Request::create('/api/me');
         $request->attributes->set('_api_resource_class', FOO::class);
 
-        $rateLimitHandler = new RateLimitHandler($cache, $throttleConfig);
+        $rateLimitHandler = new RateLimitHandler($storage, $throttleConfig);
         $rateLimitHandler->handle($request);
 
         $this->assertTrue($rateLimitHandler->isEnabled());
@@ -78,8 +78,8 @@ class RateLimitHandlerTest extends TestCase
     {
         $resetTime = gmdate('U');
 
-        $cache = $this->getMockBuilder(\Doctrine\Common\Cache\RedisCache::class)->getMock();
-        $cache->expects($this->once())
+        $storage = $this->getMockBuilder(\Doctrine\Common\Cache\RedisCache::class)->getMock();
+        $storage->expects($this->once())
             ->method('fetch')
             ->will($this->returnValue([
                 'limit' => 60,
@@ -95,7 +95,7 @@ class RateLimitHandlerTest extends TestCase
         $request = Request::create('/api/me');
         $request->attributes->set('_api_resource_class', FOO::class);
 
-        $rateLimitHandler = new RateLimitHandler($cache, $throttleConfig);
+        $rateLimitHandler = new RateLimitHandler($storage, $throttleConfig);
         $rateLimitHandler->handle($request);
 
         $this->assertTrue($rateLimitHandler->isEnabled());

@@ -14,7 +14,6 @@ namespace Indragunawan\ApiRateLimitBundle\Tests\DependencyInjection;
 use Indragunawan\ApiRateLimitBundle\DependencyInjection\IndragunawanApiRateLimitExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 
 class IndragunawanApiRateLimitExtensionTest extends TestCase
 {
@@ -35,7 +34,6 @@ class IndragunawanApiRateLimitExtensionTest extends TestCase
     {
         $this->container = new ContainerBuilder();
         $this->container->setParameter('kernel.cache_dir', '../../var/cache');
-        // $this->container->setDefinition('custom_cache', new Definition(\Doctrine\Common\Cache\RedisCache::class));
 
         $this->extension = new IndragunawanApiRateLimitExtension();
     }
@@ -69,7 +67,7 @@ class IndragunawanApiRateLimitExtensionTest extends TestCase
     {
         $config = [
             [
-                'cache' => 'custom_cache',
+                'storage' => 'custom_storage',
             ],
         ];
 
@@ -77,7 +75,7 @@ class IndragunawanApiRateLimitExtensionTest extends TestCase
 
         $this->assertTrue($this->container->hasDefinition('indragunawan_api_rate_limit.service.rate_limit_handler'));
 
-        $cacheDefinition = $this->container->getDefinition('indragunawan_api_rate_limit.service.rate_limit_handler');
-        $this->assertSame('custom_cache', (string) $cacheDefinition->getArgument(0));
+        $storageDefinition = $this->container->getDefinition('indragunawan_api_rate_limit.service.rate_limit_handler');
+        $this->assertSame('custom_storage', (string) $storageDefinition->getArgument(0));
     }
 }

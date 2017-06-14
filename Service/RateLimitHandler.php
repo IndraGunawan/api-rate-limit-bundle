@@ -24,7 +24,7 @@ class RateLimitHandler
     /**
      * @var Cache
      */
-    private $cache;
+    private $storage;
 
     /**
      * @var array
@@ -56,9 +56,9 @@ class RateLimitHandler
      */
     private $rateLimitExceeded = false;
 
-    public function __construct(Cache $cache, array $throttleConfig)
+    public function __construct(Cache $storage, array $throttleConfig)
     {
-        $this->cache = $cache;
+        $this->storage = $storage;
         $this->throttleConfig = $throttleConfig;
     }
 
@@ -96,7 +96,7 @@ class RateLimitHandler
     protected function decreaseRateLimitRemaining(string $key, int $limit, int $period, int $cost = 1)
     {
         $currentTime = gmdate('U');
-        $rateLimit = $this->cache->fetch($key);
+        $rateLimit = $this->storage->fetch($key);
         if (false !== $rateLimit && $currentTime <= $rateLimit['reset']) {
             // decrease existing rate limit remaining
             if ($rateLimit['remaining'] - $cost >= 0) {
@@ -124,7 +124,7 @@ class RateLimitHandler
             'reset' => $reset,
         ];
 
-        $this->cache->save($key, $rateLimit, $ttl);
+        $this->storage->save($key, $rateLimit, $ttl);
 
         $this->limit = $limit;
         $this->remaining = $remaining;
