@@ -47,8 +47,10 @@ Default bundle configuration
 indragunawan_api_rate_limit:
     enabled: true
 
-    # The service that is used to persist rate limit metadata. The service has to implement the Doctrine\Common\Cache\Cache interface. If no service id provided then the default storage is Filesystem (location: %kernel.cache_dir%/rate_limit).
-    storage: null
+    # The service that is used to persist rate limit metadata. The service has to implement the
+    # Psr\Cache\CacheItemPoolInterface interface. If no service id provided then the default cache
+    # is FilesystemAdapter (location: %kernel.cache_dir%/rate_limit).
+    cache: ~
 
     # Response header for rate limit information
     header:
@@ -60,8 +62,8 @@ indragunawan_api_rate_limit:
 
     # Limit the request per period per IP address
     throttle:
-        limit: 60
-        period: 60
+        limit: 60 # max attempts per period
+        period: 60 # in seconds
 
     # Exception thrown when rate limit exceeded
     exception:

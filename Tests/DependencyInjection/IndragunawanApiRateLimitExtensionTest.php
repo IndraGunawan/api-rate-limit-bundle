@@ -67,6 +67,22 @@ class IndragunawanApiRateLimitExtensionTest extends TestCase
     {
         $config = [
             [
+                'cache' => 'custom_cache',
+            ],
+        ];
+
+        $this->extension->load($config, $this->container);
+
+        $this->assertTrue($this->container->hasDefinition('indragunawan_api_rate_limit.service.rate_limit_handler'));
+
+        $storageDefinition = $this->container->getDefinition('indragunawan_api_rate_limit.service.rate_limit_handler');
+        $this->assertSame('custom_cache', (string) $storageDefinition->getArgument(0));
+    }
+
+    public function testDeprecatedServiceConfig()
+    {
+        $config = [
+            [
                 'storage' => 'custom_storage',
             ],
         ];
@@ -76,6 +92,6 @@ class IndragunawanApiRateLimitExtensionTest extends TestCase
         $this->assertTrue($this->container->hasDefinition('indragunawan_api_rate_limit.service.rate_limit_handler'));
 
         $storageDefinition = $this->container->getDefinition('indragunawan_api_rate_limit.service.rate_limit_handler');
-        $this->assertSame('custom_storage', (string) $storageDefinition->getArgument(0));
+        $this->assertSame('custom_storage', (string) $storageDefinition->getArgument(0)->getArgument(0));
     }
 }

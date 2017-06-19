@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
+
 if (!($loader = @include __DIR__.'/../vendor/autoload.php')) {
     echo <<<'EOT'
 You need to install the project dependencies using Composer:
@@ -20,3 +22,5 @@ $ phpunit
 EOT;
     exit(1);
 }
+
+AnnotationRegistry::registerLoader([$loader, 'loadClass']);

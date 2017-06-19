@@ -16,9 +16,9 @@ use Indragunawan\ApiRateLimitBundle\Annotation\ApiRateLimit;
 /**
  * This is a dummy entity. Remove it!
  *
- * @ApiRateLimit
+ * @ApiRateLimit(enabled=true)
  */
-class Foo
+class EnableRateLimit
 {
     /**
      * @var int The entity Id
