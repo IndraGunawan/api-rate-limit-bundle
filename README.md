@@ -49,7 +49,7 @@ indragunawan_api_rate_limit:
 
     # The service that is used to persist rate limit metadata. The service has to implement the
     # Psr\Cache\CacheItemPoolInterface interface. If no service id provided then the default cache
-    # is FilesystemAdapter (location: %kernel.cache_dir%/rate_limit).
+    # is Filesystem (location: %kernel.cache_dir%/api_rate_limit).
     cache: ~
 
     # Response header for rate limit information
