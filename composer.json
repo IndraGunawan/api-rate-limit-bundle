@@ -1,6 +1,8 @@
 {
     "name": "indragunawan/api-rate-limit-bundle",
-    "type": "bundle",
+    "type": "symfony-bundle",
+    "description": "Rate limits protection for api-platform resources.",
+    "keywords": ["api-platform", "rate-limit"],
     "license": "MIT",
     "authors": [
         {
