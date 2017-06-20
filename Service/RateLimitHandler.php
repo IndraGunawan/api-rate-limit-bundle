@@ -12,8 +12,8 @@
 namespace Indragunawan\ApiRateLimitBundle\Service;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Cache\Cache;
 use Indragunawan\ApiRateLimitBundle\Annotation\ApiRateLimit;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -24,7 +24,7 @@ class RateLimitHandler
     /**
      * @var Cache
      */
-    private $storage;
+    private $cacheItemPool;
 
     /**
      * @var array
@@ -56,9 +56,9 @@ class RateLimitHandler
      */
     private $rateLimitExceeded = false;
 
-    public function __construct(Cache $storage, array $throttleConfig)
+    public function __construct(CacheItemPoolInterface $cacheItemPool, array $throttleConfig)
     {
-        $this->storage = $storage;
+        $this->cacheItemPool = $cacheItemPool;
         $this->throttleConfig = $throttleConfig;
     }
 
@@ -96,8 +96,9 @@ class RateLimitHandler
     protected function decreaseRateLimitRemaining(string $key, int $limit, int $period, int $cost = 1)
     {
         $currentTime = gmdate('U');
-        $rateLimit = $this->storage->fetch($key);
-        if (false !== $rateLimit && $currentTime <= $rateLimit['reset']) {
+        $rateLimitInfo = $this->cacheItemPool->getItem($key);
+        $rateLimit = $rateLimitInfo->get();
+        if ($rateLimitInfo->isHit() && $currentTime <= $rateLimit['reset']) {
             // decrease existing rate limit remaining
             if ($rateLimit['remaining'] - $cost >= 0) {
                 $remaining = $rateLimit['remaining'] - $cost;
@@ -124,7 +125,10 @@ class RateLimitHandler
             'reset' => $reset,
         ];
 
-        $this->storage->save($key, $rateLimit, $ttl);
+        $rateLimitInfo->set($rateLimit);
+        $rateLimitInfo->expiresAfter($ttl);
+
+        $this->cacheItemPool->save($rateLimitInfo);
 
         $this->limit = $limit;
         $this->remaining = $remaining;

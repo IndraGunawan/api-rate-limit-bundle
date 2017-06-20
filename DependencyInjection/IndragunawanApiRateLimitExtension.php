@@ -11,7 +11,8 @@
 
 namespace Indragunawan\ApiRateLimitBundle\DependencyInjection;
 
-use Doctrine\Common\Cache\FilesystemCache;
+use Symfony\Component\Cache\Adapter\DoctrineAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -53,14 +54,18 @@ final class IndragunawanApiRateLimitExtension extends Extension
 
     private function registerServiceConfig(ContainerBuilder $container, array $config)
     {
-        if (null === $config['storage']) {
-            $storage = new Definition(FilesystemCache::class, [$container->getParameter('kernel.cache_dir').'/rate_limit']);
+        if (null !== $config['cache']) {
+            $cache = new Reference($config['cache']);
+        } elseif (null !== $config['storage']) {
+            @trigger_error('The indragunawan_api_rate_limit.storage configuration key is deprecated since version v0.2.0 and will be removed in v0.3.0. Use the indragunawan_api_rate_limit.cache configuration key instead.', E_USER_DEPRECATED);
+
+            $cache = new Definition(DoctrineAdapter::class, [new Reference($config['storage']), 'api_rate_limit']);
         } else {
-            $storage = new Reference($config['storage']);
+            $cache = new Definition(FilesystemAdapter::class, ['api_rate_limit', 0, $container->getParameter('kernel.cache_dir')]);
         }
 
         $container->getDefinition('indragunawan_api_rate_limit.service.rate_limit_handler')
-            ->replaceArgument(0, $storage)
+            ->replaceArgument(0, $cache)
             ->replaceArgument(1, $config['throttle']);
     }
 }
