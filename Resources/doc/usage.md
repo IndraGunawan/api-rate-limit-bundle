@@ -12,6 +12,8 @@ indragunawan_api_rate_limit:
     enabled: false
 ```
 
+---
+
 Disable rate limit per resource
 -------------------------------
 
@@ -36,3 +38,7 @@ class Foo
     // ...
 }
 ```
+
+---
+
+[Return to the index.](../../README.md)

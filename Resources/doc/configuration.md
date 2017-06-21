@@ -33,3 +33,7 @@ indragunawan_api_rate_limit:
         message: 'API rate limit exceeded for %s.' # %s will be replace with client IP address
         custom_exception: ~ # The exception has to extend Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException
 ```
+
+---
+
+[Return to the index.](../../README.md)

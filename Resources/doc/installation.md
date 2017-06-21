@@ -28,3 +28,7 @@ class AppKernel extends Kernel
     }
 }
 ```
+
+---
+
+[Return to the index.](../../README.md)
