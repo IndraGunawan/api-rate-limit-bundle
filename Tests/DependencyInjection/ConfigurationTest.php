@@ -12,6 +12,7 @@
 namespace Indragunawan\ApiRateLimitBundle\Tests\DependencyInjection;
 
 use Indragunawan\ApiRateLimitBundle\DependencyInjection\Configuration;
+use Indragunawan\ApiRateLimitBundle\Tests\Fixtures\Exception\ValidRateLimitExceededException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
@@ -65,5 +66,54 @@ class ConfigurationTest extends TestCase
                 ],
             ]
         );
+    }
+
+    public function testExceptionClassNotExist()
+    {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+
+        $config = $this->processor->processConfiguration(
+            $this->configuration,
+            [
+                [
+                    'exception' => [
+                        'custom_exception' => 'Exceptio',
+                    ],
+                ],
+            ]
+        );
+    }
+
+    public function testExceptionClassNotSubclass()
+    {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+
+        $config = $this->processor->processConfiguration(
+            $this->configuration,
+            [
+                [
+                    'exception' => [
+                        'custom_exception' => 'Exception',
+                    ],
+                ],
+            ]
+        );
+    }
+
+    public function testValidExceptionClass()
+    {
+        // var_dump(\Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException::class); die();
+        $config = $this->processor->processConfiguration(
+            $this->configuration,
+            [
+                [
+                    'exception' => [
+                        'custom_exception' => ValidRateLimitExceededException::class,
+                    ],
+                ],
+            ]
+        );
+
+        $this->assertSame(ValidRateLimitExceededException::class, $config['exception']['custom_exception']);
     }
 }

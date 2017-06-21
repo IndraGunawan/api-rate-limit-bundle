@@ -69,7 +69,7 @@ indragunawan_api_rate_limit:
     exception:
         status_code: 429
         message: 'API rate limit exceeded for %s.' # %s will be replace with client IP address
-        custom_exception: null
+        custom_exception: ~ # The exception has to extend Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException
 ```
 
 ### Disable on development

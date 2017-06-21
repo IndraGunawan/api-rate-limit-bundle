@@ -11,6 +11,7 @@
 
 namespace Indragunawan\ApiRateLimitBundle\DependencyInjection;
 
+use Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -67,7 +68,24 @@ final class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->scalarNode('message')->cannotBeEmpty()->defaultValue('API rate limit exceeded for %s.')->end()
-                        ->scalarNode('custom_exception')->cannotBeEmpty()->defaultNull()->end()
+                        ->scalarNode('custom_exception')
+                            ->cannotBeEmpty()
+                            ->defaultNull()
+                            ->validate()
+                            ->ifTrue(function ($v) {
+                                if (!class_exists($v)) {
+                                    return true;
+                                }
+
+                                if (!is_subclass_of($v, RateLimitExceededException::class)) {
+                                    return true;
+                                }
+
+                                return false;
+                            })
+                                ->thenInvalid('The class %s does not exist or not extend "Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException" class.')
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end();
