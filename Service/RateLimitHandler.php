@@ -15,6 +15,9 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Indragunawan\ApiRateLimitBundle\Annotation\ApiRateLimit;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 
 /**
  * @author Indra Gunawan <hello@indra.my.id>
@@ -25,6 +28,16 @@ class RateLimitHandler
      * @var Cache
      */
     private $cacheItemPool;
+
+    /**
+     * @var TokenStorageInterface
+     */
+    private $tokenStorage;
+
+    /**
+     * @var AuthorizationCheckerInterface
+     */
+    private $authorizationChecker;
 
     /**
      * @var array
@@ -56,17 +69,45 @@ class RateLimitHandler
      */
     private $rateLimitExceeded = false;
 
-    public function __construct(CacheItemPoolInterface $cacheItemPool, array $throttleConfig)
-    {
+    public function __construct(
+        CacheItemPoolInterface $cacheItemPool,
+        TokenStorageInterface $tokenStorage,
+        AuthorizationCheckerInterface $authorizationChecker,
+        array $throttleConfig
+    ) {
         $this->cacheItemPool = $cacheItemPool;
+        $this->tokenStorage = $tokenStorage;
+        $this->authorizationChecker = $authorizationChecker;
         $this->throttleConfig = $throttleConfig;
+    }
+
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    public function isRateLimitExceeded()
+    {
+        return $this->rateLimitExceeded;
+    }
+
+    public function getRateLimitInfo(): array
+    {
+        return [
+            'limit' => $this->limit,
+            'remaining' => $this->remaining,
+            'reset' => $this->reset,
+        ];
+    }
+
+    public static function generateCacheKey(string $ip, string $userName = null, string $userRole = null): string
+    {
+        return sprintf('_api_rate_limit_metadata$%s', $userName && $userRole ? sprintf('%s$%s', $userRole, $userName) : $ip);
     }
 
     public function handle(Request $request)
     {
-        $key = $this->getKey($request);
-        $limit = $this->throttleConfig['limit'];
-        $period = $this->throttleConfig['period'];
+        list($key, $limit, $period) = $this->getThrottle($request);
 
         $annotationReader = new AnnotationReader();
         $annotation = $annotationReader->getClassAnnotation(new \ReflectionClass($request->attributes->get('_api_resource_class')), ApiRateLimit::class);
@@ -79,23 +120,11 @@ class RateLimitHandler
         }
     }
 
-    public function getRateLimitInfo(): array
+    protected function decreaseRateLimitRemaining(string $key, int $limit, int $period)
     {
-        return [
-            'limit' => $this->limit,
-            'remaining' => $this->remaining,
-            'reset' => $this->reset,
-        ];
-    }
-
-    protected function getKey(Request $request): string
-    {
-        return sprintf('api_rate_limit$%s', sha1($request->getClientIp()));
-    }
-
-    protected function decreaseRateLimitRemaining(string $key, int $limit, int $period, int $cost = 1)
-    {
+        $cost = 1;
         $currentTime = gmdate('U');
+
         $rateLimitInfo = $this->cacheItemPool->getItem($key);
         $rateLimit = $rateLimitInfo->get();
         if ($rateLimitInfo->isHit() && $currentTime <= $rateLimit['reset']) {
@@ -135,13 +164,28 @@ class RateLimitHandler
         $this->reset = $reset;
     }
 
-    public function isEnabled()
+    private function getThrottle(Request $request)
     {
-        return $this->enabled;
-    }
+        $userName = null;
+        $userRole = null;
+        $limit = $this->throttleConfig['default']['limit'];
+        $period = $this->throttleConfig['default']['limit'];
 
-    public function isRateLimitExceeded()
-    {
-        return $this->rateLimitExceeded;
+        foreach ($this->throttleConfig['roles'] as $role => $throttle) {
+            try {
+                if ($this->authorizationChecker->isGranted($role)) {
+                    $userName = $this->tokenStorage->getToken()->getUsername();
+                    $userRole = $role;
+                    $limit = $throttle['limit'];
+                    $period = $throttle['period'];
+
+                    break;
+                }
+            } catch (AuthenticationCredentialsNotFoundException $e) {
+                // do nothing
+            }
+        }
+
+        return [self::generateCacheKey($request->getClientIp(), $userName, $userRole), $limit, $period];
     }
 }

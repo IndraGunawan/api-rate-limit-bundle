@@ -66,6 +66,6 @@ final class IndragunawanApiRateLimitExtension extends Extension
 
         $container->getDefinition('indragunawan_api_rate_limit.service.rate_limit_handler')
             ->replaceArgument(0, $cache)
-            ->replaceArgument(1, $config['throttle']);
+            ->replaceArgument(3, $config['throttle']);
     }
 }
