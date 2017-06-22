@@ -3,8 +3,8 @@ ApiRateLimitBundle
 
 [![license](https://img.shields.io/github/license/IndraGunawan/api-rate-limit-bundle.svg?style=flat-square)](https://github.com/IndraGunawan/api-rate-limit-bundle/blob/master/LICENSE.md)
 [![Travis](https://img.shields.io/travis/IndraGunawan/api-rate-limit-bundle.svg?style=flat-square)](https://travis-ci.org/IndraGunawan/api-rate-limit-bundle)
-[![Scrutinizer Coverage](https://img.shields.io/scrutinizer/coverage/g/IndraGunawan/api-rate-limit-bundle.svg?style=flat-square)](https://scrutinizer-ci.com/g/IndraGunawan/api-rate-limit-bundle/badges/coverage.png?b=master)
-[![Scrutinizer](https://img.shields.io/scrutinizer/g/IndraGunawan/api-rate-limit-bundle.svg?style=flat-square)](https://scrutinizer-ci.com/g/IndraGunawan/api-rate-limit-bundle/badges/quality-score.png?b=master)
+[![Scrutinizer Coverage](https://img.shields.io/scrutinizer/coverage/g/IndraGunawan/api-rate-limit-bundle.svg?style=flat-square)](https://scrutinizer-ci.com/g/IndraGunawan/api-rate-limit-bundle/?branch=master)
+[![Scrutinizer](https://img.shields.io/scrutinizer/g/IndraGunawan/api-rate-limit-bundle.svg?style=flat-square)](https://scrutinizer-ci.com/g/IndraGunawan/api-rate-limit-bundle/?branch=master)
 
 This bundle provide rate limits protection for [ApiPlatform](https://api-platform.com/) resources.
 
