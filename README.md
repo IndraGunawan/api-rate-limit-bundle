@@ -22,7 +22,6 @@ Documentation
 Todo
 ----
 
-* Rate limit per user ROLE
 
 License
 -------
