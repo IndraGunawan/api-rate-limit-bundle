@@ -13,6 +13,7 @@
         <service id="indragunawan_api_rate_limit.event_listener.header_modification" class="%indragunawan_api_rate_limit.event_listener.header_modification.class%">
             <argument/>
             <argument/>
+
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="0" />
         </service>
 
@@ -20,6 +21,8 @@
             <argument/>
             <argument type="service" id="indragunawan_api_rate_limit.service.rate_limit_handler" />
             <argument/>
+            <argument type="service" id="security.token_storage" />
+
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="0" />
         </service>
     </services>
