@@ -16,6 +16,8 @@ Documentation
 * [Usage](Resources/doc/usage.md)
     * [Disable on development](Resources/doc/usage.md#disable-on-development)
     * [Disable rate limit per resource](Resources/doc/usage.md#disable-rate-limit-per-resource)
+    * [Custom Exception](Resources/doc/usage.md#custom-exception)
+    * [Custom Cache](Resources/doc/usage.md#custom-cache)
 
 Todo
 ----
