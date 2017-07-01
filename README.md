@@ -20,10 +20,6 @@ Documentation
     * [Custom Cache](Resources/doc/usage.md#custom-cache)
     * [Role based rate limit](Resources/doc/usage.md#role-based-rate-limit)
 
-Todo
-----
-
-
 License
 -------
 
