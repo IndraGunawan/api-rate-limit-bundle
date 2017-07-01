@@ -102,7 +102,6 @@ class ConfigurationTest extends TestCase
 
     public function testValidExceptionClass()
     {
-        // var_dump(\Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException::class); die();
         $config = $this->processor->processConfiguration(
             $this->configuration,
             [
@@ -115,5 +114,22 @@ class ConfigurationTest extends TestCase
         );
 
         $this->assertSame(ValidRateLimitExceededException::class, $config['exception']['custom_exception']);
+    }
+
+    public function testDeprecatedConfiguration()
+    {
+        $config = $this->processor->processConfiguration(
+            $this->configuration,
+            [
+                [
+                    'throttle' => [
+                        'limit' => 10,
+                        'period' => 10,
+                    ],
+                ],
+            ]
+        );
+
+        $this->assertSame(['limit' => 10, 'period' => 10], $config['throttle']['default']);
     }
 }

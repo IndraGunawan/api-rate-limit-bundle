@@ -15,6 +15,7 @@ use Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException;
 use Indragunawan\ApiRateLimitBundle\Service\RateLimitHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * @author Indra Gunawan <hello@indra.my.id>
@@ -36,11 +37,17 @@ class RateLimitListener
      */
     private $exceptionConfig;
 
-    public function __construct(bool $enabled, RateLimitHandler $rateLimitHandler, array $exceptionConfig)
+    /**
+     * @var TokenStorageInterface
+     */
+    private $tokenStorage;
+
+    public function __construct(bool $enabled, RateLimitHandler $rateLimitHandler, array $exceptionConfig, TokenStorageInterface $tokenStorage)
     {
         $this->enabled = $enabled;
         $this->rateLimitHandler = $rateLimitHandler;
         $this->exceptionConfig = $exceptionConfig;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function onKernelRequest(GetResponseEvent $event)
@@ -81,7 +88,14 @@ class RateLimitListener
     {
         $config = $this->exceptionConfig;
         $class = $config['custom_exception'] ?? RateLimitExceededException::class;
+        $username = null;
 
-        return new $class($config['status_code'], $config['message'], $request->getClientIp());
+        if (null !== $token = $this->tokenStorage->getToken()) {
+            if (is_object($token->getUser())) {
+                $username = $token->getUsername();
+            }
+        }
+
+        return new $class($config['status_code'], $config['message'], $request->getClientIp(), $username);
     }
 }

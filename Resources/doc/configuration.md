@@ -22,10 +22,13 @@ indragunawan_api_rate_limit:
             remaining: X-RateLimit-Remaining
             reset: X-RateLimit-Reset
 
-    # Limit the request per period per IP address
+    # Limit the request per period per IP address / user
     throttle:
-        limit: 60 # max attempts per period
-        period: 60 # in seconds
+        default:
+            limit: 60 # max attempts per period
+            period: 60 # in seconds
+        roles: {}
+        sort: 'rate-limit-desc' # available value 'first-match', 'rate-limit-asc', 'rate-limit-desc'. default value rate-limit-desc
 
     # Exception thrown when rate limit exceeded
     exception:

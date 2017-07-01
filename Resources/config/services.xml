@@ -15,6 +15,8 @@
     <services>
         <service id="indragunawan_api_rate_limit.service.rate_limit_handler" class="%indragunawan_api_rate_limit.service.rate_limit_handler.class%" public="false">
             <argument/>
+            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="security.authorization_checker" />
             <argument/>
         </service>
     </services>

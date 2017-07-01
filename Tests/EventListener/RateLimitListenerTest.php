@@ -16,6 +16,9 @@ use Indragunawan\ApiRateLimitBundle\Service\RateLimitHandler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class RateLimitListenerTest extends TestCase
 {
@@ -33,7 +36,9 @@ class RateLimitListenerTest extends TestCase
             ->method('isMasterRequest')
             ->will($this->returnValue(true));
 
-        $listener = new RateLimitListener(false, $rateLimitHandler, []);
+        $tokenStorage = $this->createMock(TokenStorage::class);
+
+        $listener = new RateLimitListener(false, $rateLimitHandler, [], $tokenStorage);
         $listener->onKernelRequest($event);
     }
 
@@ -55,7 +60,9 @@ class RateLimitListenerTest extends TestCase
             ->method('getRequest')
             ->will($this->returnValue(Request::create('/api/me')));
 
-        $listener = new RateLimitListener(true, $rateLimitHandler, []);
+        $tokenStorage = $this->createMock(TokenStorage::class);
+
+        $listener = new RateLimitListener(true, $rateLimitHandler, [], $tokenStorage);
         $listener->onKernelRequest($event);
     }
 
@@ -64,10 +71,6 @@ class RateLimitListenerTest extends TestCase
         $rateLimitHandler = $this->getMockBuilder(RateLimitHandler::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        // $rateLimitHandler->expects($this->never())
-        //     ->method('handle')
-        //     ->willReturn($this->returnValue(true));
 
         $event = $this->getMockBuilder(GetResponseEvent::class)
             ->disableOriginalConstructor()
@@ -83,7 +86,9 @@ class RateLimitListenerTest extends TestCase
             ->method('getRequest')
             ->will($this->returnValue($request));
 
-        $listener = new RateLimitListener(true, $rateLimitHandler, []);
+        $tokenStorage = $this->createMock(TokenStorage::class);
+
+        $listener = new RateLimitListener(true, $rateLimitHandler, [], $tokenStorage);
         $listener->onKernelRequest($event);
     }
 
@@ -118,15 +123,18 @@ class RateLimitListenerTest extends TestCase
             ->method('getRequest')
             ->will($this->returnValue($request));
 
-        $listener = new RateLimitListener(true, $rateLimitHandler, []);
+        $tokenStorage = $this->createMock(TokenStorage::class);
+
+        $listener = new RateLimitListener(true, $rateLimitHandler, [], $tokenStorage);
         $listener->onKernelRequest($event);
 
         $this->assertTrue(true);
     }
 
-    public function testRateLimitExceeded()
+    public function testRateLimitExceededForAnonymousUser()
     {
         $this->expectException(\Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException::class);
+        $this->expectExceptionMessage('API rate limit exceeded for 127.0.0.1.');
 
         $rateLimitHandler = $this->getMockBuilder(RateLimitHandler::class)
             ->disableOriginalConstructor()
@@ -160,10 +168,74 @@ class RateLimitListenerTest extends TestCase
 
         $exceptionConfig = [
             'status_code' => 429,
-            'message' => 'API rate limit exceeded.',
+            'message' => 'API rate limit exceeded for %s.',
         ];
 
-        $listener = new RateLimitListener(true, $rateLimitHandler, $exceptionConfig);
+        $tokenStorage = $this->createMock(TokenStorage::class);
+
+        $listener = new RateLimitListener(true, $rateLimitHandler, $exceptionConfig, $tokenStorage);
+        $listener->onKernelRequest($event);
+
+        $this->assertTrue(true);
+    }
+
+    public function testRateLimitExceededForAuthenticatedUser()
+    {
+        $this->expectException(\Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException::class);
+        $this->expectExceptionMessage('API rate limit exceeded for user.');
+
+        $rateLimitHandler = $this->getMockBuilder(RateLimitHandler::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $rateLimitHandler->expects($this->once())
+            ->method('handle');
+
+        $rateLimitHandler->expects($this->once())
+            ->method('isEnabled')
+            ->will($this->returnValue(true));
+
+        $rateLimitHandler->expects($this->once())
+            ->method('isRateLimitExceeded')
+            ->will($this->returnValue(true));
+
+        $event = $this->getMockBuilder(GetResponseEvent::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $event->expects($this->once())
+            ->method('isMasterRequest')
+            ->will($this->returnValue(true));
+
+        $request = Request::create('/api/me');
+        $request->attributes->set('_api_resource_class', 'Foo');
+
+        $event->expects($this->once())
+            ->method('getRequest')
+            ->will($this->returnValue($request));
+
+        $exceptionConfig = [
+            'status_code' => 429,
+            'message' => 'API rate limit exceeded for %s.',
+        ];
+
+        $user = $this->createMock(UserInterface::class);
+
+        $token = $this->createMock(UsernamePasswordToken::class);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->will($this->returnValue($user));
+
+        $token->expects($this->once())
+            ->method('getUsername')
+            ->will($this->returnValue('user'));
+
+        $tokenStorage = $this->createMock(TokenStorage::class);
+        $tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $listener = new RateLimitListener(true, $rateLimitHandler, $exceptionConfig, $tokenStorage);
         $listener->onKernelRequest($event);
 
         $this->assertTrue(true);

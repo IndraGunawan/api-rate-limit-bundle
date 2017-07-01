@@ -51,10 +51,49 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->arrayNode('throttle')
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return is_array($v) && (isset($v['limit']) || isset($v['period'])); })
+                        ->then(function ($v) {
+                            $v['default'] = [];
+                            if (isset($v['limit'])) {
+                                @trigger_error('The indragunawan_api_rate_limit.throttle.limit configuration key is deprecated since version v0.2.0 and will be removed in v0.3.0. Use the indragunawan_api_rate_limit.throttle.default.limit configuration key instead.', E_USER_DEPRECATED);
+
+                                $v['default']['limit'] = $v['limit'];
+                            }
+
+                            if (isset($v['period'])) {
+                                @trigger_error('The indragunawan_api_rate_limit.throttle.period configuration key is deprecated since version v0.2.0 and will be removed in v0.3.0. Use the indragunawan_api_rate_limit.throttle.default.period configuration key instead.', E_USER_DEPRECATED);
+
+                                $v['default']['period'] = $v['period'];
+                            }
+
+                            return $v;
+                        })
+                    ->end()
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->integerNode('limit')->defaultValue(60)->end()
+                        ->integerNode('limit')->min(1)->defaultValue(60)->end()
                         ->integerNode('period')->min(1)->defaultValue(60)->end()
+                        ->arrayNode('default')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->integerNode('limit')->min(1)->defaultValue(60)->end()
+                                ->integerNode('period')->min(1)->defaultValue(60)->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('roles')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->children()
+                                    ->integerNode('limit')->isRequired()->min(1)->end()
+                                    ->integerNode('period')->isRequired()->min(1)->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->enumNode('sort')
+                            ->values(['first-match', 'rate-limit-asc', 'rate-limit-desc'])
+                            ->defaultValue('rate-limit-desc')
+                        ->end()
                     ->end()
                 ->end()
                 ->arrayNode('exception')

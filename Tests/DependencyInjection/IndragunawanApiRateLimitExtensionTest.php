@@ -94,4 +94,94 @@ class IndragunawanApiRateLimitExtensionTest extends TestCase
         $storageDefinition = $this->container->getDefinition('indragunawan_api_rate_limit.service.rate_limit_handler');
         $this->assertSame('custom_storage', (string) $storageDefinition->getArgument(0)->getArgument(0));
     }
+
+    public function testSortFirstMatch()
+    {
+        $roles = [
+            'ROLE_ADMIN' => [
+                'limit' => 100,
+                'period' => 10,
+            ],
+            'ROLE_USER' => [
+                'limit' => 10,
+                'period' => 10,
+            ],
+        ];
+
+        $config = [
+            [
+                'throttle' => [
+                    'roles' => $roles,
+                    'sort' => 'first-match',
+                ],
+            ],
+        ];
+
+        $this->extension->load($config, $this->container);
+
+        $this->assertTrue($this->container->hasDefinition('indragunawan_api_rate_limit.service.rate_limit_handler'));
+
+        $storageDefinition = $this->container->getDefinition('indragunawan_api_rate_limit.service.rate_limit_handler');
+        $this->assertSame($roles, $storageDefinition->getArgument(3)['roles']);
+    }
+
+    public function testSortRateLimitAsc()
+    {
+        $roles = [
+            'ROLE_ADMIN' => [
+                'limit' => 100,
+                'period' => 10,
+            ],
+            'ROLE_USER' => [
+                'limit' => 10,
+                'period' => 10,
+            ],
+        ];
+
+        $config = [
+            [
+                'throttle' => [
+                    'roles' => $roles,
+                    'sort' => 'rate-limit-asc',
+                ],
+            ],
+        ];
+
+        $this->extension->load($config, $this->container);
+
+        $this->assertTrue($this->container->hasDefinition('indragunawan_api_rate_limit.service.rate_limit_handler'));
+
+        $storageDefinition = $this->container->getDefinition('indragunawan_api_rate_limit.service.rate_limit_handler');
+        $this->assertSame(array_reverse($roles), $storageDefinition->getArgument(3)['roles']);
+    }
+
+    public function testSortRateLimitDesc()
+    {
+        $roles = [
+            'ROLE_USER' => [
+                'limit' => 10,
+                'period' => 10,
+            ],
+            'ROLE_ADMIN' => [
+                'limit' => 100,
+                'period' => 10,
+            ],
+        ];
+
+        $config = [
+            [
+                'throttle' => [
+                    'roles' => $roles,
+                    'sort' => 'rate-limit-desc',
+                ],
+            ],
+        ];
+
+        $this->extension->load($config, $this->container);
+
+        $this->assertTrue($this->container->hasDefinition('indragunawan_api_rate_limit.service.rate_limit_handler'));
+
+        $storageDefinition = $this->container->getDefinition('indragunawan_api_rate_limit.service.rate_limit_handler');
+        $this->assertSame(array_reverse($roles), $storageDefinition->getArgument(3)['roles']);
+    }
 }

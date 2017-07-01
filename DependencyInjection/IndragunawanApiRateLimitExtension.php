@@ -64,8 +64,18 @@ final class IndragunawanApiRateLimitExtension extends Extension
             $cache = new Definition(FilesystemAdapter::class, ['api_rate_limit', 0, $container->getParameter('kernel.cache_dir')]);
         }
 
+        if ('rate-limit-asc' === $config['throttle']['sort']) {
+            uasort($config['throttle']['roles'], function (array $a, array $b) {
+                return ($a['limit'] / $a['period']) <=> ($b['limit'] / $b['period']);
+            });
+        } elseif ('rate-limit-desc' === $config['throttle']['sort']) {
+            uasort($config['throttle']['roles'], function (array $a, array $b) {
+                return ($b['limit'] / $b['period']) <=> ($a['limit'] / $a['period']);
+            });
+        }
+
         $container->getDefinition('indragunawan_api_rate_limit.service.rate_limit_handler')
             ->replaceArgument(0, $cache)
-            ->replaceArgument(1, $config['throttle']);
+            ->replaceArgument(3, $config['throttle']);
     }
 }
