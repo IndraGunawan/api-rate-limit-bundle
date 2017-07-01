@@ -102,7 +102,11 @@ class RateLimitHandler
 
     public static function generateCacheKey(string $ip, string $userName = null, string $userRole = null): string
     {
-        return sprintf('_api_rate_limit_metadata$%s', sha1($userName && $userRole ? sprintf('%s$%s', $userRole, $userName) : $ip));
+        if (!empty($userName) && !empty($userRole)) {
+            return sprintf('_api_rate_limit_metadata$%s', sha1($userRole.$userName));
+        }
+
+        return sprintf('_api_rate_limit_metadata$%s', sha1($ip));
     }
 
     public function handle(Request $request)
@@ -166,26 +170,29 @@ class RateLimitHandler
 
     private function getThrottle(Request $request)
     {
-        $userName = null;
-        $userRole = null;
-        $limit = $this->throttleConfig['default']['limit'];
-        $period = $this->throttleConfig['default']['period'];
+        if (null !== $token = $this->tokenStorage->getToken()) {
+            // no anonymous
+            if (is_object($token->getUser())) {
+                foreach ($this->throttleConfig['roles'] as $role => $throttle) {
+                    try {
+                        if ($this->authorizationChecker->isGranted($role)) {
+                            $userName = $token->getUsername();
+                            $userRole = $role;
+                            $limit = $throttle['limit'];
+                            $period = $throttle['period'];
 
-        foreach ($this->throttleConfig['roles'] as $role => $throttle) {
-            try {
-                if ($this->authorizationChecker->isGranted($role)) {
-                    $userName = $this->tokenStorage->getToken()->getUsername();
-                    $userRole = $role;
-                    $limit = $throttle['limit'];
-                    $period = $throttle['period'];
-
-                    break;
+                            return [self::generateCacheKey($request->getClientIp(), $userName, $userRole), $limit, $period];
+                        }
+                    } catch (AuthenticationCredentialsNotFoundException $e) {
+                        // do nothing
+                    }
                 }
-            } catch (AuthenticationCredentialsNotFoundException $e) {
-                // do nothing
             }
         }
 
-        return [self::generateCacheKey($request->getClientIp(), $userName, $userRole), $limit, $period];
+        $limit = $this->throttleConfig['default']['limit'];
+        $period = $this->throttleConfig['default']['period'];
+
+        return [self::generateCacheKey($request->getClientIp()), $limit, $period];
     }
 }

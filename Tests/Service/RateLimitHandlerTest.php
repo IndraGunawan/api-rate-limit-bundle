@@ -23,6 +23,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class RateLimitHandlerTest extends TestCase
 {
@@ -212,9 +213,15 @@ class RateLimitHandlerTest extends TestCase
             ->method('getItem')
             ->will($this->returnValue($cacheItem));
 
+        $user = $this->createMock(UserInterface::class);
+
         $token = $this->getMockBuilder(UsernamePasswordToken::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $token->expects($this->once())
+            ->method('getUser')
+            ->will($this->returnValue($user));
 
         $token->expects($this->once())
             ->method('isAuthenticated')
