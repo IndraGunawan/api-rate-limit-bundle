@@ -102,7 +102,7 @@ class RateLimitHandler
 
     public static function generateCacheKey(string $ip, string $userName = null, string $userRole = null): string
     {
-        return sprintf('_api_rate_limit_metadata$%s', $userName && $userRole ? sprintf('%s$%s', $userRole, $userName) : $ip);
+        return sprintf('_api_rate_limit_metadata$%s', sha1($userName && $userRole ? sprintf('%s$%s', $userRole, $userName) : $ip));
     }
 
     public function handle(Request $request)
@@ -169,7 +169,7 @@ class RateLimitHandler
         $userName = null;
         $userRole = null;
         $limit = $this->throttleConfig['default']['limit'];
-        $period = $this->throttleConfig['default']['limit'];
+        $period = $this->throttleConfig['default']['period'];
 
         foreach ($this->throttleConfig['roles'] as $role => $throttle) {
             try {
