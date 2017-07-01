@@ -18,6 +18,7 @@ Documentation
     * [Disable rate limit per resource](Resources/doc/usage.md#disable-rate-limit-per-resource)
     * [Custom Exception](Resources/doc/usage.md#custom-exception)
     * [Custom Cache](Resources/doc/usage.md#custom-cache)
+    * [Role based rate limit](Resources/doc/usage.md#role-based-rate-limit)
 
 Todo
 ----

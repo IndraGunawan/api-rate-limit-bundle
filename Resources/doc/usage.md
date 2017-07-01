@@ -99,4 +99,29 @@ indragunawan_api_rate_limit:
 
 ---
 
+Role based rate limit
+---------------------
+
+By default, default throttle applies to all users (anonymous / authenticated user). If you want to apply rate limiting to all users who belong to the specified role, you can use user role based throttle configuration. If a user does not belong to your defined roles, the throttle will fall back to default.
+
+The `indragunawan_api_rate_limit.throttle.sort` configuration key is to sort only's the user role base throttle. The default value is `rate-limit-desc` that sorts high-low the request per second, other values are `rate-limit-asc` sorts low-high the request per second and `first-match` which uses your defined role throttle order.
+
+```yml
+indragunawan_api_rate_limit:
+    throttle:
+        default:
+            limit: 60 # max attempts per period
+            period: 60 # in seconds
+        roles:
+            ROLE_USER:
+                limit: 100
+                period: 60
+            ROLE_ADMIN:
+                limit: 1000
+                period: 60
+        sort: 'rate-limit-desc' # available value 'first-match', 'rate-limit-asc', 'rate-limit-desc'. default value 'rate-limit-desc'
+```
+
+---
+
 [Return to the index.](../../README.md)
