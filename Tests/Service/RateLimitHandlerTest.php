@@ -224,6 +224,10 @@ class RateLimitHandlerTest extends TestCase
             ->will($this->returnValue($user));
 
         $token->expects($this->once())
+            ->method('getUsername')
+            ->will($this->returnValue('myusername'));
+
+        $token->expects($this->once())
             ->method('isAuthenticated')
             ->will($this->returnValue(true));
 
@@ -270,7 +274,7 @@ class RateLimitHandlerTest extends TestCase
         $this->assertFalse($rateLimitHandler->isRateLimitExceeded());
     }
 
-    public function testAuthenticationCredentialNotFound()
+    public function testTokenNotFound()
     {
         $cacheItem = $this->createMock(CacheItemInterface::class);
 

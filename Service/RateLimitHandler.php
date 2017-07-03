@@ -17,7 +17,6 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 
 /**
  * @author Indra Gunawan <hello@indra.my.id>
@@ -100,10 +99,10 @@ class RateLimitHandler
         ];
     }
 
-    public static function generateCacheKey(string $ip, string $userName = null, string $userRole = null): string
+    public static function generateCacheKey(string $ip, string $username = null, string $userRole = null): string
     {
-        if (!empty($userName) && !empty($userRole)) {
-            return sprintf('_api_rate_limit_metadata$%s', sha1($userRole.$userName));
+        if (!empty($username) && !empty($userRole)) {
+            return sprintf('_api_rate_limit_metadata$%s', sha1($userRole.$username));
         }
 
         return sprintf('_api_rate_limit_metadata$%s', sha1($ip));
@@ -174,17 +173,13 @@ class RateLimitHandler
             // no anonymous
             if (is_object($token->getUser())) {
                 foreach ($this->throttleConfig['roles'] as $role => $throttle) {
-                    try {
-                        if ($this->authorizationChecker->isGranted($role)) {
-                            $userName = $token->getUsername();
-                            $userRole = $role;
-                            $limit = $throttle['limit'];
-                            $period = $throttle['period'];
+                    if ($this->authorizationChecker->isGranted($role)) {
+                        $username = $token->getUsername();
+                        $userRole = $role;
+                        $limit = $throttle['limit'];
+                        $period = $throttle['period'];
 
-                            return [self::generateCacheKey($request->getClientIp(), $userName, $userRole), $limit, $period];
-                        }
-                    } catch (AuthenticationCredentialsNotFoundException $e) {
-                        // do nothing
+                        return [self::generateCacheKey($request->getClientIp(), $username, $userRole), $limit, $period];
                     }
                 }
             }
