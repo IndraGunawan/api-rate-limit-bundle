@@ -4,6 +4,7 @@ CHANGELOG
 v0.2.1
 ------
 * Adding Symfony4 support (#5)
+* Fix dependencies for Symfony Flex
 
 v0.2.0
 ------
