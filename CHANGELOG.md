@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v0.2.1
+------
+* Adding Symfony4 support (#5)
+
 v0.2.0
 ------
 
