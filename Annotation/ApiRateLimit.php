@@ -23,4 +23,9 @@ final class ApiRateLimit
      * @var bool
      */
     public $enabled = true;
+
+    /**
+     * @var array
+     */
+    public $throttle = [];
 }

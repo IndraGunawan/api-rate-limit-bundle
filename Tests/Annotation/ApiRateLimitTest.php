@@ -20,7 +20,9 @@ class ApiRateLimitTest extends TestCase
     {
         $rateLimit = new ApiRateLimit();
         $rateLimit->enabled = false;
+        $rateLimit->throttle = ['foo' => 'bar'];
 
         $this->assertFalse($rateLimit->enabled);
+        $this->assertEquals(['foo' => 'bar'], $rateLimit->throttle);
     }
 }

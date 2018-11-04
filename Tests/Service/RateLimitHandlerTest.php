@@ -14,6 +14,7 @@ namespace Indragunawan\ApiRateLimitBundle\Tests\Service;
 use Indragunawan\ApiRateLimitBundle\Service\RateLimitHandler;
 use Indragunawan\ApiRateLimitBundle\Tests\Fixtures\Entity\DisableRateLimit;
 use Indragunawan\ApiRateLimitBundle\Tests\Fixtures\Entity\EnableRateLimit;
+use Indragunawan\ApiRateLimitBundle\Tests\Fixtures\Entity\ThrottleConfigured;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -334,4 +335,125 @@ class RateLimitHandlerTest extends TestCase
 
         $this->assertFalse($rateLimitHandler->isRateLimitExceeded());
     }
+
+    public function testAnnotationDefaultConfiguration() {
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+
+        $cacheItem->expects($this->once())
+            ->method('isHit')
+            ->will($this->returnValue(false));
+
+        $cacheItemPool = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItemPool->expects($this->once())
+            ->method('getItem')
+            ->will($this->returnValue($cacheItem));
+
+        $tokenStorage = $this->createMock(TokenStorage::class);
+        $authorizationChecker = $this->getMockBuilder(AuthorizationChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $throttleConfig = [
+            'default' => [
+                'limit' => 60,
+                'period' => 60,
+            ],
+            'roles' => [],
+        ];
+
+        $request = Request::create('/api/me');
+        $request->attributes->set('_api_resource_class', ThrottleConfigured::class);
+
+        $rateLimitHandler = new RateLimitHandler($cacheItemPool, $tokenStorage, $authorizationChecker, $throttleConfig);
+        $rateLimitHandler->handle($request);
+
+        $this->assertTrue($rateLimitHandler->isEnabled());
+        $this->assertSame([
+            'limit' => 8,
+            'remaining' => 7,
+            'reset' => gmdate('U') + 8, // 8 is configured period on resource
+        ], $rateLimitHandler->getRateLimitInfo());
+    }
+
+    public function testAnnotationRateLimitByRole()
+    {
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+
+        $cacheItem->expects($this->once())
+            ->method('isHit')
+            ->will($this->returnValue(false));
+
+        $cacheItem->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue([]));
+
+        $cacheItemPool = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItemPool->expects($this->once())
+            ->method('getItem')
+            ->will($this->returnValue($cacheItem));
+
+        $user = $this->createMock(UserInterface::class);
+
+        $token = $this->getMockBuilder(UsernamePasswordToken::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $token->expects($this->once())
+            ->method('getUser')
+            ->will($this->returnValue($user));
+
+        $token->expects($this->once())
+            ->method('getUsername')
+            ->will($this->returnValue('myusername'));
+
+        $token->expects($this->once())
+            ->method('isAuthenticated')
+            ->will($this->returnValue(true));
+
+        $tokenStorage = $this->createMock(TokenStorage::class);
+        $tokenStorage->expects($this->any())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager->expects($this->once())
+            ->method('decide')
+            ->will($this->returnValue(true));
+
+        $authorizationChecker = $this->getMockBuilder(AuthorizationChecker::class)
+            ->setConstructorArgs([$tokenStorage, $authenticationManager, $accessDecisionManager])
+            ->getMock();
+
+        $throttleConfig = [
+            'default' => [
+                'limit' => 60,
+                'period' => 60,
+            ],
+            'roles' => [
+                'ROLE_USER' => [
+                    'limit' => 10,
+                    'period' => 10,
+                ],
+            ],
+        ];
+
+        $request = Request::create('/api/me');
+        $request->attributes->set('_api_resource_class', ThrottleConfigured::class);
+
+        $rateLimitHandler = new RateLimitHandler($cacheItemPool, $tokenStorage, $authorizationChecker, $throttleConfig);
+        $rateLimitHandler->handle($request);
+
+        $this->assertTrue($rateLimitHandler->isEnabled());
+
+        $this->assertSame([
+            'limit' => 4,
+            'remaining' => 3,
+            'reset' => gmdate('U') + 4, // 8 is configured period on resource
+        ], $rateLimitHandler->getRateLimitInfo());
+
+        $this->assertFalse($rateLimitHandler->isRateLimitExceeded());
+    }
+
+
 }

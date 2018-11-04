@@ -15,33 +15,6 @@ indragunawan_api_rate_limit:
 
 ---
 
-Disable rate limit per resource
--------------------------------
-
-By default, rate limit applies to all ApiResources. If you wish to disable the rate limit on some resources, you can use the `ApiRateLimit` annotation and set the `enabled` property to `false` to disable the rate limit.
-
-```php
-<?php
-
-// src/AppBundle/Entity/Foo.php
-
-use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\ORM\Mapping as ORM;
-use Indragunawan\ApiRateLimitBundle\Annotation\ApiRateLimit;
-
-/**
- * @ApiResource
- * @ORM\Entity
- * @ApiRateLimit(enabled=false)
- */
-class Foo
-{
-    // ...
-}
-```
-
----
-
 Custom Exception
 ----------------
 
@@ -120,6 +93,48 @@ indragunawan_api_rate_limit:
                 limit: 1000
                 period: 60
         sort: 'rate-limit-desc' # available value 'first-match', 'rate-limit-asc', 'rate-limit-desc'. default value 'rate-limit-desc'
+```
+
+---
+
+Configuration per resource
+-------------------------------
+
+If you wish to configure the rate limits differently on some resources, you can use the `ApiRateLimit` annotation and set the `throttle` property in the same way you do in your main configuration.
+You can also choose to enable or disable rate limiting by using the `enabled` property.
+
+```php
+<?php
+
+// src/AppBundle/Entity/Foo.php
+
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\ORM\Mapping as ORM;
+use Indragunawan\ApiRateLimitBundle\Annotation\ApiRateLimit;
+
+/**
+ * @ApiResource
+ * @ORM\Entity
+ * @ApiRateLimit(
+ *     enabled=true, 
+ *     throttle={
+ *         "default"={
+ *             "limit"=10,
+ *             "period"=10
+ *         },
+ *         "roles"={
+ *             "ROLE_USER"={
+ *                 "limit"=10,
+ *                 "period"=10
+ *             }
+ *         }
+ *     }
+ * )
+ */
+class Foo
+{
+    // ...
+}
 ```
 
 ---
