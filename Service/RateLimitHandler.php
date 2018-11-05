@@ -14,6 +14,7 @@ namespace Indragunawan\ApiRateLimitBundle\Service;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Indragunawan\ApiRateLimitBundle\Annotation\ApiRateLimit;
 use Psr\Cache\CacheItemPoolInterface;
+use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -24,7 +25,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class RateLimitHandler
 {
     /**
-     * @var Cache
+     * @var CacheItemPoolInterface
      */
     private $cacheItemPool;
 
@@ -68,6 +69,14 @@ class RateLimitHandler
      */
     private $rateLimitExceeded = false;
 
+    /**
+     * RateLimitHandler constructor.
+     *
+     * @param CacheItemPoolInterface $cacheItemPool
+     * @param TokenStorageInterface $tokenStorage
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param array $throttleConfig
+     */
     public function __construct(
         CacheItemPoolInterface $cacheItemPool,
         TokenStorageInterface $tokenStorage,
@@ -80,49 +89,84 @@ class RateLimitHandler
         $this->throttleConfig = $throttleConfig;
     }
 
+    /**
+     * @return bool
+     */
     public function isEnabled()
     {
         return $this->enabled;
     }
 
+    /**
+     * @return bool
+     */
     public function isRateLimitExceeded()
     {
         return $this->rateLimitExceeded;
     }
 
+    /**
+     * @return array
+     */
     public function getRateLimitInfo(): array
     {
         return [
-            'limit' => $this->limit,
+            'limit'     => $this->limit,
             'remaining' => $this->remaining,
-            'reset' => $this->reset,
+            'reset'     => $this->reset,
         ];
     }
 
+    /**
+     * @param string $ip
+     * @param string|null $username
+     * @param string|null $userRole
+     *
+     * @return string
+     */
     public static function generateCacheKey(string $ip, string $username = null, string $userRole = null): string
     {
         if (!empty($username) && !empty($userRole)) {
-            return sprintf('_api_rate_limit_metadata$%s', sha1($userRole.$username));
+            return sprintf('_api_rate_limit_metadata$%s', sha1($userRole . $username));
         }
 
         return sprintf('_api_rate_limit_metadata$%s', sha1($ip));
     }
 
+    /**
+     * @param Request $request
+     *
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \ReflectionException
+     */
     public function handle(Request $request)
     {
-        list($key, $limit, $period) = $this->getThrottle($request);
-
         $annotationReader = new AnnotationReader();
-        $annotation = $annotationReader->getClassAnnotation(new \ReflectionClass($request->attributes->get('_api_resource_class')), ApiRateLimit::class);
+        /** @var ApiRateLimit $annotation */
+        $annotation = $annotationReader->getClassAnnotation(
+            new ReflectionClass($request->attributes->get('_api_resource_class')),
+            ApiRateLimit::class
+        );
+
         if (null !== $annotation) {
             $this->enabled = $annotation->enabled;
         }
+
+        list($key, $limit, $period) = $this->getThrottle($request, $annotation);
 
         if ($this->enabled) {
             $this->decreaseRateLimitRemaining($key, $limit, $period);
         }
     }
 
+    /**
+     * @param string $key
+     * @param int $limit
+     * @param int $period
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     protected function decreaseRateLimitRemaining(string $key, int $limit, int $period)
     {
         $cost = 1;
@@ -167,12 +211,22 @@ class RateLimitHandler
         $this->reset = $reset;
     }
 
-    private function getThrottle(Request $request)
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    private function getThrottle(Request $request, ApiRateLimit $annotation)
     {
         if (null !== $token = $this->tokenStorage->getToken()) {
             // no anonymous
             if (is_object($token->getUser())) {
-                foreach ($this->throttleConfig['roles'] as $role => $throttle) {
+                $rolesConfig = $this->throttleConfig['roles'];
+                if (!empty($annotation->throttle['roles'])) {
+                    $rolesConfig = $annotation->throttle['roles'];
+                }
+
+                foreach ($rolesConfig as $role => $throttle) {
                     if ($this->authorizationChecker->isGranted($role)) {
                         $username = $token->getUsername();
                         $userRole = $role;
@@ -185,8 +239,13 @@ class RateLimitHandler
             }
         }
 
-        $limit = $this->throttleConfig['default']['limit'];
-        $period = $this->throttleConfig['default']['period'];
+        if (!empty($annotation->throttle['default'])) {
+            $limit = $annotation->throttle['default']['limit'];
+            $period = $annotation->throttle['default']['period'];
+        } else {
+            $limit = $this->throttleConfig['default']['limit'];
+            $period = $this->throttleConfig['default']['period'];
+        }
 
         return [self::generateCacheKey($request->getClientIp()), $limit, $period];
     }
