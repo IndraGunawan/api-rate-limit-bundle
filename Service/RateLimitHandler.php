@@ -151,7 +151,9 @@ class RateLimitHandler
 
         if (null !== $annotation) {
             $this->enabled = $annotation->enabled;
-        }
+        } else {
+	    $annotation = new ApiRateLimit();
+	}
 
         list($key, $limit, $period) = $this->getThrottle($request, $annotation);
 
