@@ -28,4 +28,10 @@ final class ApiRateLimit
      * @var array
      */
     public $throttle = [];
+
+    /**
+     * @var array
+     * @example ["GET", "POST"]
+     */
+    public $methods = [];
 }
