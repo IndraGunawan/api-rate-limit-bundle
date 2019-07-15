@@ -151,13 +151,13 @@ class RateLimitHandler
 
         if (null !== $annotation) {
             $this->enabled = $annotation->enabled;
-            if(!in_array($request->getMethod(), array_map('strtoupper', $annotation->methods)) &&  !empty($annotation->methods)) {
+            if (!in_array($request->getMethod(), array_map('strtoupper', $annotation->methods), true) && !empty($annotation->methods)) {
                 // The annotation is ignored as the method is not corresponding
                 $annotation = new ApiRateLimit();
             }
         } else {
-	    $annotation = new ApiRateLimit();
-	}
+            $annotation = new ApiRateLimit();
+        }
 
         list($key, $limit, $period) = $this->getThrottle($request, $annotation);
 
