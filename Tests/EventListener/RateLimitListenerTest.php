@@ -24,22 +24,22 @@ class RateLimitListenerTest extends TestCase
 {
     public function testDisabledApiRateLimit()
     {
-        $rateLimitHandler = $this->createMock(RateLimitHandler::class);
+        $rateLimitHandler = $this->prophesize(RateLimitHandler::class);
         $event = $this->createMock(RequestEvent::class);
 
         $event->expects($this->never())
             ->method('isMasterRequest')
             ->will($this->returnValue(true));
 
-        $tokenStorage = $this->createMock(TokenStorage::class);
+        $tokenStorage = $this->prophesize(TokenStorage::class);
 
-        $listener = new RateLimitListener(false, $rateLimitHandler, [], $tokenStorage);
+        $listener = new RateLimitListener(false, $rateLimitHandler->reveal(), [], $tokenStorage->reveal());
         $listener->onKernelRequest($event);
     }
 
     public function testNotMasterRequest()
     {
-        $rateLimitHandler = $this->createMock(RateLimitHandler::class);
+        $rateLimitHandler = $this->prophesize(RateLimitHandler::class);
         $event = $this->createMock(RequestEvent::class);
 
         $event->expects($this->once())
@@ -50,15 +50,15 @@ class RateLimitListenerTest extends TestCase
             ->method('getRequest')
             ->will($this->returnValue(Request::create('/api/me')));
 
-        $tokenStorage = $this->createMock(TokenStorage::class);
+        $tokenStorage = $this->prophesize(TokenStorage::class);
 
-        $listener = new RateLimitListener(true, $rateLimitHandler, [], $tokenStorage);
+        $listener = new RateLimitListener(true, $rateLimitHandler->reveal(), [], $tokenStorage->reveal());
         $listener->onKernelRequest($event);
     }
 
     public function testNoApiResourceClass()
     {
-        $rateLimitHandler = $this->createMock(RateLimitHandler::class);
+        $rateLimitHandler = $this->prophesize(RateLimitHandler::class);
         $event = $this->createMock(RequestEvent::class);
 
         $event->expects($this->once())
@@ -71,15 +71,15 @@ class RateLimitListenerTest extends TestCase
             ->method('getRequest')
             ->will($this->returnValue($request));
 
-        $tokenStorage = $this->createMock(TokenStorage::class);
+        $tokenStorage = $this->prophesize(TokenStorage::class);
 
-        $listener = new RateLimitListener(true, $rateLimitHandler, [], $tokenStorage);
+        $listener = new RateLimitListener(true, $rateLimitHandler->reveal(), [], $tokenStorage->reveal());
         $listener->onKernelRequest($event);
     }
 
     public function testRateLimitHandlerDisabled()
     {
-        $rateLimitHandler = $this->createMock(RateLimitHandler::class);
+        $rateLimitHandler = $this->prophesize(RateLimitHandler::class);
 
         $rateLimitHandler->expects($this->once())
             ->method('handle');
@@ -104,9 +104,9 @@ class RateLimitListenerTest extends TestCase
             ->method('getRequest')
             ->will($this->returnValue($request));
 
-        $tokenStorage = $this->createMock(TokenStorage::class);
+        $tokenStorage = $this->prophesize(TokenStorage::class);
 
-        $listener = new RateLimitListener(true, $rateLimitHandler, [], $tokenStorage);
+        $listener = new RateLimitListener(true, $rateLimitHandler->reveal(), [], $tokenStorage->reveal());
         $listener->onKernelRequest($event);
 
         $this->assertTrue(true);
@@ -117,7 +117,7 @@ class RateLimitListenerTest extends TestCase
         $this->expectException(\Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException::class);
         $this->expectExceptionMessage('API rate limit exceeded for 127.0.0.1.');
 
-        $rateLimitHandler = $this->createMock(RateLimitHandler::class);
+        $rateLimitHandler = $this->prophesize(RateLimitHandler::class);
 
         $rateLimitHandler->expects($this->once())
             ->method('handle');
@@ -148,9 +148,9 @@ class RateLimitListenerTest extends TestCase
             'message' => 'API rate limit exceeded for %s.',
         ];
 
-        $tokenStorage = $this->createMock(TokenStorage::class);
+        $tokenStorage = $this->prophesize(TokenStorage::class);
 
-        $listener = new RateLimitListener(true, $rateLimitHandler, $exceptionConfig, $tokenStorage);
+        $listener = new RateLimitListener(true, $rateLimitHandler->reveal(), $exceptionConfig, $tokenStorage->reveal());
         $listener->onKernelRequest($event);
 
         $this->assertTrue(true);
@@ -161,7 +161,7 @@ class RateLimitListenerTest extends TestCase
         $this->expectException(\Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException::class);
         $this->expectExceptionMessage('API rate limit exceeded for user.');
 
-        $rateLimitHandler = $this->createMock(RateLimitHandler::class);
+        $rateLimitHandler = $this->prophesize(RateLimitHandler::class);
 
         $rateLimitHandler->expects($this->once())
             ->method('handle');
@@ -208,7 +208,7 @@ class RateLimitListenerTest extends TestCase
             ->method('getToken')
             ->will($this->returnValue($token));
 
-        $listener = new RateLimitListener(true, $rateLimitHandler, $exceptionConfig, $tokenStorage);
+        $listener = new RateLimitListener(true, $rateLimitHandler->reveal(), $exceptionConfig, $tokenStorage);
         $listener->onKernelRequest($event);
 
         $this->assertTrue(true);

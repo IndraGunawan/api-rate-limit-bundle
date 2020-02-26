@@ -26,7 +26,7 @@ class HeaderModificationListenerTest extends TestCase
 
     public function setUp(): void
     {
-        $this->kernel = $this->createMock(HttpKernelInterface::class);
+        $this->kernel = $this->prophesize(HttpKernelInterface::class)->reveal();
     }
 
     public function tearDown(): void
