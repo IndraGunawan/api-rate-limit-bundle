@@ -115,21 +115,4 @@ class ConfigurationTest extends TestCase
 
         $this->assertSame(ValidRateLimitExceededException::class, $config['exception']['custom_exception']);
     }
-
-    public function testDeprecatedConfiguration()
-    {
-        $config = $this->processor->processConfiguration(
-            $this->configuration,
-            [
-                [
-                    'throttle' => [
-                        'limit' => 10,
-                        'period' => 10,
-                    ],
-                ],
-            ]
-        );
-
-        $this->assertSame(['limit' => 10, 'period' => 10], $config['throttle']['default']);
-    }
 }
