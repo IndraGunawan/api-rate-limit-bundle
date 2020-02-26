@@ -11,7 +11,7 @@
 
 namespace Indragunawan\ApiRateLimitBundle\EventListener;
 
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
  * @author Indra Gunawan <hello@indra.my.id>
@@ -29,9 +29,9 @@ class HeaderModificationListener
     }
 
     /**
-     * @param FilterResponseEvent $event
+     * @param ResponseEvent $event
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event)
     {
         if (false === $this->header['display']) {
             return;

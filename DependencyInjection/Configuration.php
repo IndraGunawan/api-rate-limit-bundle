@@ -28,13 +28,17 @@ final class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('indragunawan_api_rate_limit');
+        if (method_exists(TreeBuilder::class, 'getRootNode')) {
+            $treeBuilder = new TreeBuilder('indragunawan_api_rate_limit');
+            $rootNode = $treeBuilder->getRootNode();
+        } else {
+            $treeBuilder = new TreeBuilder();
+            $rootNode = $treeBuilder->root('indragunawan_api_rate_limit');
+        }
 
         $rootNode
             ->children()
                 ->booleanNode('enabled')->defaultTrue()->end()
-                ->scalarNode('storage')->defaultNull()->cannotBeEmpty()->end()
                 ->scalarNode('cache')->defaultNull()->cannotBeEmpty()->end()
                 ->arrayNode('header')
                     ->addDefaultsIfNotSet()
@@ -51,29 +55,8 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->arrayNode('throttle')
-                    ->beforeNormalization()
-                        ->ifTrue(function ($v) { return is_array($v) && (isset($v['limit']) || isset($v['period'])); })
-                        ->then(function ($v) {
-                            $v['default'] = [];
-                            if (isset($v['limit'])) {
-                                @trigger_error('The indragunawan_api_rate_limit.throttle.limit configuration key is deprecated since version v0.2.0 and will be removed in v0.3.0. Use the indragunawan_api_rate_limit.throttle.default.limit configuration key instead.', E_USER_DEPRECATED);
-
-                                $v['default']['limit'] = $v['limit'];
-                            }
-
-                            if (isset($v['period'])) {
-                                @trigger_error('The indragunawan_api_rate_limit.throttle.period configuration key is deprecated since version v0.2.0 and will be removed in v0.3.0. Use the indragunawan_api_rate_limit.throttle.default.period configuration key instead.', E_USER_DEPRECATED);
-
-                                $v['default']['period'] = $v['period'];
-                            }
-
-                            return $v;
-                        })
-                    ->end()
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->integerNode('limit')->min(1)->defaultValue(60)->end()
-                        ->integerNode('period')->min(1)->defaultValue(60)->end()
                         ->arrayNode('default')
                             ->addDefaultsIfNotSet()
                             ->children()

@@ -1,8 +1,21 @@
 CHANGELOG
 =========
 
+v0.4.0
+------
+
+* Symfony 5 compatibility (#14)
+
+v0.3.0
+------
+
+* Feature. Configuration per using annotations (#9)
+* Feature. Rate limit to specific methods (#12)
+* Fix null ApiRateLimit instance in RateLimitHandler (#11)
+
 v0.2.1
 ------
+
 * Adding Symfony4 support (#5)
 * Fix dependencies for Symfony Flex
 

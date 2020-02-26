@@ -15,7 +15,7 @@ use Indragunawan\ApiRateLimitBundle\EventListener\RateLimitListener;
 use Indragunawan\ApiRateLimitBundle\Service\RateLimitHandler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -24,13 +24,8 @@ class RateLimitListenerTest extends TestCase
 {
     public function testDisabledApiRateLimit()
     {
-        $rateLimitHandler = $this->getMockBuilder(RateLimitHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event = $this->getMockBuilder(GetResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $rateLimitHandler = $this->createMock(RateLimitHandler::class);
+        $event = $this->createMock(RequestEvent::class);
 
         $event->expects($this->never())
             ->method('isMasterRequest')
@@ -44,13 +39,8 @@ class RateLimitListenerTest extends TestCase
 
     public function testNotMasterRequest()
     {
-        $rateLimitHandler = $this->getMockBuilder(RateLimitHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event = $this->getMockBuilder(GetResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $rateLimitHandler = $this->createMock(RateLimitHandler::class);
+        $event = $this->createMock(RequestEvent::class);
 
         $event->expects($this->once())
             ->method('isMasterRequest')
@@ -68,13 +58,8 @@ class RateLimitListenerTest extends TestCase
 
     public function testNoApiResourceClass()
     {
-        $rateLimitHandler = $this->getMockBuilder(RateLimitHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event = $this->getMockBuilder(GetResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $rateLimitHandler = $this->createMock(RateLimitHandler::class);
+        $event = $this->createMock(RequestEvent::class);
 
         $event->expects($this->once())
             ->method('isMasterRequest')
@@ -94,9 +79,7 @@ class RateLimitListenerTest extends TestCase
 
     public function testRateLimitHandlerDisabled()
     {
-        $rateLimitHandler = $this->getMockBuilder(RateLimitHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $rateLimitHandler = $this->createMock(RateLimitHandler::class);
 
         $rateLimitHandler->expects($this->once())
             ->method('handle');
@@ -108,9 +91,7 @@ class RateLimitListenerTest extends TestCase
         $rateLimitHandler->expects($this->never())
             ->method('isRateLimitExceeded');
 
-        $event = $this->getMockBuilder(GetResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(RequestEvent::class);
 
         $event->expects($this->once())
             ->method('isMasterRequest')
@@ -136,9 +117,7 @@ class RateLimitListenerTest extends TestCase
         $this->expectException(\Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException::class);
         $this->expectExceptionMessage('API rate limit exceeded for 127.0.0.1.');
 
-        $rateLimitHandler = $this->getMockBuilder(RateLimitHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $rateLimitHandler = $this->createMock(RateLimitHandler::class);
 
         $rateLimitHandler->expects($this->once())
             ->method('handle');
@@ -151,9 +130,7 @@ class RateLimitListenerTest extends TestCase
             ->method('isRateLimitExceeded')
             ->will($this->returnValue(true));
 
-        $event = $this->getMockBuilder(GetResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(RequestEvent::class);
 
         $event->expects($this->once())
             ->method('isMasterRequest')
@@ -184,9 +161,7 @@ class RateLimitListenerTest extends TestCase
         $this->expectException(\Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException::class);
         $this->expectExceptionMessage('API rate limit exceeded for user.');
 
-        $rateLimitHandler = $this->getMockBuilder(RateLimitHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $rateLimitHandler = $this->createMock(RateLimitHandler::class);
 
         $rateLimitHandler->expects($this->once())
             ->method('handle');
@@ -199,9 +174,7 @@ class RateLimitListenerTest extends TestCase
             ->method('isRateLimitExceeded')
             ->will($this->returnValue(true));
 
-        $event = $this->getMockBuilder(GetResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(RequestEvent::class);
 
         $event->expects($this->once())
             ->method('isMasterRequest')

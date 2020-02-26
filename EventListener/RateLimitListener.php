@@ -14,7 +14,7 @@ namespace Indragunawan\ApiRateLimitBundle\EventListener;
 use Indragunawan\ApiRateLimitBundle\Exception\RateLimitExceededException;
 use Indragunawan\ApiRateLimitBundle\Service\RateLimitHandler;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
@@ -50,7 +50,7 @@ class RateLimitListener
         $this->tokenStorage = $tokenStorage;
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         if (!$this->enabled) {
             return;
