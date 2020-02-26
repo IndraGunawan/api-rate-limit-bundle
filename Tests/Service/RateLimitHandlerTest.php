@@ -40,9 +40,7 @@ class RateLimitHandlerTest extends TestCase
             ->method('getItem');
 
         $tokenStorage = $this->createMock(TokenStorage::class);
-        $authorizationChecker = $this->getMockBuilder(AuthorizationChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $authorizationChecker = $this->createMock(AuthorizationChecker::class);
 
         $throttleConfig = [
             'default' => [
@@ -75,9 +73,7 @@ class RateLimitHandlerTest extends TestCase
             ->will($this->returnValue($cacheItem));
 
         $tokenStorage = $this->createMock(TokenStorage::class);
-        $authorizationChecker = $this->getMockBuilder(AuthorizationChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $authorizationChecker = $this->createMock(AuthorizationChecker::class);
 
         $throttleConfig = [
             'default' => [
@@ -123,9 +119,7 @@ class RateLimitHandlerTest extends TestCase
             ->will($this->returnValue($cacheItem));
 
         $tokenStorage = $this->createMock(TokenStorage::class);
-        $authorizationChecker = $this->getMockBuilder(AuthorizationChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $authorizationChecker = $this->createMock(AuthorizationChecker::class);
 
         $throttleConfig = [
             'default' => [
@@ -170,9 +164,7 @@ class RateLimitHandlerTest extends TestCase
             ->will($this->returnValue($cacheItem));
 
         $tokenStorage = $this->createMock(TokenStorage::class);
-        $authorizationChecker = $this->getMockBuilder(AuthorizationChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $authorizationChecker = $this->createMock(AuthorizationChecker::class);
 
         $throttleConfig = [
             'default' => [
@@ -216,9 +208,7 @@ class RateLimitHandlerTest extends TestCase
 
         $user = $this->createMock(UserInterface::class);
 
-        $token = $this->getMockBuilder(UsernamePasswordToken::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $token = $this->createMock(UsernamePasswordToken::class);
 
         $token->expects($this->once())
             ->method('getUser')
@@ -243,7 +233,7 @@ class RateLimitHandlerTest extends TestCase
             ->method('decide')
             ->will($this->returnValue(true));
 
-        $authorizationChecker = $this->getMockBuilder(AuthorizationChecker::class)
+            $authorizationChecker = $this->getMockBuilder(AuthorizationChecker::class)
             ->setConstructorArgs([$tokenStorage, $authenticationManager, $accessDecisionManager])
             ->getMock();
 
@@ -292,9 +282,7 @@ class RateLimitHandlerTest extends TestCase
             ->method('getItem')
             ->will($this->returnValue($cacheItem));
 
-        $token = $this->getMockBuilder(UsernamePasswordToken::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $token = $this->createMock(UsernamePasswordToken::class);
 
         $tokenStorage = $this->createMock(TokenStorage::class);
         $tokenStorage->expects($this->any())
@@ -349,9 +337,7 @@ class RateLimitHandlerTest extends TestCase
             ->will($this->returnValue($cacheItem));
 
         $tokenStorage = $this->createMock(TokenStorage::class);
-        $authorizationChecker = $this->getMockBuilder(AuthorizationChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $authorizationChecker = $this->createMock(AuthorizationChecker::class);
 
         $throttleConfig = [
             'default' => [
@@ -394,9 +380,7 @@ class RateLimitHandlerTest extends TestCase
 
         $user = $this->createMock(UserInterface::class);
 
-        $token = $this->getMockBuilder(UsernamePasswordToken::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $token = $this->createMock(UsernamePasswordToken::class);
 
         $token->expects($this->once())
             ->method('getUser')

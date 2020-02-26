@@ -30,7 +30,7 @@ class IndragunawanApiRateLimitExtensionTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->container->setParameter('kernel.cache_dir', '../../var/cache');
@@ -41,7 +41,7 @@ class IndragunawanApiRateLimitExtensionTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->container, $this->extension);
     }
