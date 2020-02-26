@@ -36,7 +36,6 @@ final class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->booleanNode('enabled')->defaultTrue()->end()
-                ->scalarNode('storage')->defaultNull()->cannotBeEmpty()->end()
                 ->scalarNode('cache')->defaultNull()->cannotBeEmpty()->end()
                 ->arrayNode('header')
                     ->addDefaultsIfNotSet()

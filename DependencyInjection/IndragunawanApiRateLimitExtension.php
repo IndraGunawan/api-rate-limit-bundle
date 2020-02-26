@@ -56,10 +56,6 @@ final class IndragunawanApiRateLimitExtension extends Extension
     {
         if (null !== $config['cache']) {
             $cache = new Reference($config['cache']);
-        } elseif (null !== $config['storage']) {
-            @trigger_error('The indragunawan_api_rate_limit.storage configuration key is deprecated since version v0.2.0 and will be removed in v0.3.0. Use the indragunawan_api_rate_limit.cache configuration key instead.', E_USER_DEPRECATED);
-
-            $cache = new Definition(DoctrineAdapter::class, [new Reference($config['storage']), 'api_rate_limit']);
         } else {
             $cache = new Definition(FilesystemAdapter::class, ['api_rate_limit', 0, $container->getParameter('kernel.cache_dir')]);
         }
