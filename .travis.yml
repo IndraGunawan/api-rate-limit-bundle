@@ -1,12 +1,12 @@
 language: php
 
-sudo: false
+os: linux
 
 cache:
     directories:
         - $HOME/.composer/cache
 
-matrix:
+jobs:
     include:
         - php: '7.1'
         - php: '7.2'
