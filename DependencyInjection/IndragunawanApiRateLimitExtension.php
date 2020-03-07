@@ -11,7 +11,6 @@
 
 namespace Indragunawan\ApiRateLimitBundle\DependencyInjection;
 
-use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

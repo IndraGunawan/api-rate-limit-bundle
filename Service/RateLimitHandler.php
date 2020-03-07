@@ -71,11 +71,6 @@ class RateLimitHandler
 
     /**
      * RateLimitHandler constructor.
-     *
-     * @param CacheItemPoolInterface $cacheItemPool
-     * @param TokenStorageInterface $tokenStorage
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param array $throttleConfig
      */
     public function __construct(
         CacheItemPoolInterface $cacheItemPool,
@@ -105,37 +100,25 @@ class RateLimitHandler
         return $this->rateLimitExceeded;
     }
 
-    /**
-     * @return array
-     */
     public function getRateLimitInfo(): array
     {
         return [
-            'limit'     => $this->limit,
+            'limit' => $this->limit,
             'remaining' => $this->remaining,
-            'reset'     => $this->reset,
+            'reset' => $this->reset,
         ];
     }
 
-    /**
-     * @param string $ip
-     * @param string|null $username
-     * @param string|null $userRole
-     *
-     * @return string
-     */
     public static function generateCacheKey(string $ip, string $username = null, string $userRole = null): string
     {
         if (!empty($username) && !empty($userRole)) {
-            return sprintf('_api_rate_limit_metadata$%s', sha1($userRole . $username));
+            return sprintf('_api_rate_limit_metadata$%s', sha1($userRole.$username));
         }
 
         return sprintf('_api_rate_limit_metadata$%s', sha1($ip));
     }
 
     /**
-     * @param Request $request
-     *
      * @throws \Doctrine\Common\Annotations\AnnotationException
      * @throws \Psr\Cache\InvalidArgumentException
      * @throws \ReflectionException
@@ -151,7 +134,7 @@ class RateLimitHandler
 
         if (null !== $annotation) {
             $this->enabled = $annotation->enabled;
-            if (!in_array($request->getMethod(), array_map('strtoupper', $annotation->methods), true) && !empty($annotation->methods)) {
+            if (!\in_array($request->getMethod(), array_map('strtoupper', $annotation->methods), true) && !empty($annotation->methods)) {
                 // The annotation is ignored as the method is not corresponding
                 $annotation = new ApiRateLimit();
             }
@@ -167,10 +150,6 @@ class RateLimitHandler
     }
 
     /**
-     * @param string $key
-     * @param int $limit
-     * @param int $period
-     *
      * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function decreaseRateLimitRemaining(string $key, int $limit, int $period)
@@ -218,15 +197,13 @@ class RateLimitHandler
     }
 
     /**
-     * @param Request $request
-     *
      * @return array
      */
     private function getThrottle(Request $request, ApiRateLimit $annotation)
     {
         if (null !== $token = $this->tokenStorage->getToken()) {
             // no anonymous
-            if (is_object($token->getUser())) {
+            if (\is_object($token->getUser())) {
                 $rolesConfig = $this->throttleConfig['roles'];
                 if (!empty($annotation->throttle['roles'])) {
                     $rolesConfig = $annotation->throttle['roles'];

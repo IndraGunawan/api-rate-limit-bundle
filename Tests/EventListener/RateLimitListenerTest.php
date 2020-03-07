@@ -29,7 +29,7 @@ class RateLimitListenerTest extends TestCase
 
         $event->expects($this->never())
             ->method('isMasterRequest')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $tokenStorage = $this->createMock(TokenStorage::class);
 
@@ -44,11 +44,11 @@ class RateLimitListenerTest extends TestCase
 
         $event->expects($this->once())
             ->method('isMasterRequest')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $event->expects($this->never())
             ->method('getRequest')
-            ->will($this->returnValue(Request::create('/api/me')));
+            ->willReturn(Request::create('/api/me'));
 
         $tokenStorage = $this->createMock(TokenStorage::class);
 
@@ -63,13 +63,13 @@ class RateLimitListenerTest extends TestCase
 
         $event->expects($this->once())
             ->method('isMasterRequest')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $request = Request::create('/api/me');
 
         $event->expects($this->once())
             ->method('getRequest')
-            ->will($this->returnValue($request));
+            ->willReturn($request);
 
         $tokenStorage = $this->createMock(TokenStorage::class);
 
@@ -86,7 +86,7 @@ class RateLimitListenerTest extends TestCase
 
         $rateLimitHandler->expects($this->once())
             ->method('isEnabled')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $rateLimitHandler->expects($this->never())
             ->method('isRateLimitExceeded');
@@ -95,14 +95,14 @@ class RateLimitListenerTest extends TestCase
 
         $event->expects($this->once())
             ->method('isMasterRequest')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $request = Request::create('/api/me');
         $request->attributes->set('_api_resource_class', 'Foo');
 
         $event->expects($this->once())
             ->method('getRequest')
-            ->will($this->returnValue($request));
+            ->willReturn($request);
 
         $tokenStorage = $this->createMock(TokenStorage::class);
 
@@ -124,24 +124,24 @@ class RateLimitListenerTest extends TestCase
 
         $rateLimitHandler->expects($this->once())
             ->method('isEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $rateLimitHandler->expects($this->once())
             ->method('isRateLimitExceeded')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $event = $this->createMock(RequestEvent::class);
 
         $event->expects($this->once())
             ->method('isMasterRequest')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $request = Request::create('/api/me');
         $request->attributes->set('_api_resource_class', 'Foo');
 
         $event->expects($this->once())
             ->method('getRequest')
-            ->will($this->returnValue($request));
+            ->willReturn($request);
 
         $exceptionConfig = [
             'status_code' => 429,
@@ -168,24 +168,24 @@ class RateLimitListenerTest extends TestCase
 
         $rateLimitHandler->expects($this->once())
             ->method('isEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $rateLimitHandler->expects($this->once())
             ->method('isRateLimitExceeded')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $event = $this->createMock(RequestEvent::class);
 
         $event->expects($this->once())
             ->method('isMasterRequest')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $request = Request::create('/api/me');
         $request->attributes->set('_api_resource_class', 'Foo');
 
         $event->expects($this->once())
             ->method('getRequest')
-            ->will($this->returnValue($request));
+            ->willReturn($request);
 
         $exceptionConfig = [
             'status_code' => 429,
@@ -197,16 +197,16 @@ class RateLimitListenerTest extends TestCase
         $token = $this->createMock(UsernamePasswordToken::class);
         $token->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $token->expects($this->once())
             ->method('getUsername')
-            ->will($this->returnValue('user'));
+            ->willReturn('user');
 
         $tokenStorage = $this->createMock(TokenStorage::class);
         $tokenStorage->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue($token));
+            ->willReturn($token);
 
         $listener = new RateLimitListener(true, $rateLimitHandler, $exceptionConfig, $tokenStorage);
         $listener->onKernelRequest($event);

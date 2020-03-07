@@ -31,6 +31,7 @@ final class ApiRateLimit
 
     /**
      * @var array
+     *
      * @example ["GET", "POST"]
      */
     public $methods = [];
