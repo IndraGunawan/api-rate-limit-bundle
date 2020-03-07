@@ -76,8 +76,8 @@ class HeaderModificationListenerTest extends TestCase
 
         $attributes = $this->prophesize(ParameterBag::class);
         $attributes->get('_api_rate_limit_info', null)->willReturn([
-            'limit' => 60,
-            'remaining' => 59,
+            'limit' => '60',
+            'remaining' => '59',
             'reset' => $resetTime,
         ])->shouldBeCalledTimes(1);
 
