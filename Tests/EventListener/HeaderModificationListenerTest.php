@@ -100,8 +100,8 @@ class HeaderModificationListenerTest extends TestCase
         $listener = new HeaderModificationListener($headerConfig);
         $listener->onKernelResponse($event);
 
-        $this->assertEquals(60, $response->headers->get('X-RateLimit-Limit'));
-        $this->assertEquals(59, $response->headers->get('X-RateLimit-Remaining'));
+        $this->assertSame('60', $response->headers->get('X-RateLimit-Limit'));
+        $this->assertSame('59', $response->headers->get('X-RateLimit-Remaining'));
         $this->assertSame($resetTime, $response->headers->get('X-RateLimit-Reset'));
     }
 }

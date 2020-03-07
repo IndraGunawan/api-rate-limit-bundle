@@ -80,8 +80,6 @@ class RateLimitListener
     /**
      * Returns an RateLimitExceededException.
      *
-     * @param Request $request
-     *
      * @return RateLimitExceededException
      */
     protected function createRateLimitExceededException(Request $request)
@@ -91,7 +89,7 @@ class RateLimitListener
         $username = null;
 
         if (null !== $token = $this->tokenStorage->getToken()) {
-            if (is_object($token->getUser())) {
+            if (\is_object($token->getUser())) {
                 $username = $token->getUsername();
             }
         }

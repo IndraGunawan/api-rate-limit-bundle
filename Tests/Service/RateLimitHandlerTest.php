@@ -65,12 +65,12 @@ class RateLimitHandlerTest extends TestCase
 
         $cacheItem->expects($this->once())
             ->method('isHit')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $cacheItemPool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItemPool->expects($this->once())
             ->method('getItem')
-            ->will($this->returnValue($cacheItem));
+            ->willReturn($cacheItem);
 
         $tokenStorage = $this->createMock(TokenStorage::class);
         $authorizationChecker = $this->createMock(AuthorizationChecker::class);
@@ -103,20 +103,20 @@ class RateLimitHandlerTest extends TestCase
 
         $cacheItem->expects($this->once())
             ->method('isHit')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $cacheItem->expects($this->once())
             ->method('get')
-            ->will($this->returnValue([
+            ->willReturn([
                 'limit' => 60,
                 'remaining' => 0,
                 'reset' => gmdate('U'),
-            ]));
+            ]);
 
         $cacheItemPool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItemPool->expects($this->once())
             ->method('getItem')
-            ->will($this->returnValue($cacheItem));
+            ->willReturn($cacheItem);
 
         $tokenStorage = $this->createMock(TokenStorage::class);
         $authorizationChecker = $this->createMock(AuthorizationChecker::class);
@@ -148,20 +148,20 @@ class RateLimitHandlerTest extends TestCase
 
         $cacheItem->expects($this->once())
             ->method('isHit')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $cacheItem->expects($this->once())
             ->method('get')
-            ->will($this->returnValue([
+            ->willReturn([
                 'limit' => 60,
                 'remaining' => 50,
                 'reset' => gmdate('U'),
-            ]));
+            ]);
 
         $cacheItemPool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItemPool->expects($this->once())
             ->method('getItem')
-            ->will($this->returnValue($cacheItem));
+            ->willReturn($cacheItem);
 
         $tokenStorage = $this->createMock(TokenStorage::class);
         $authorizationChecker = $this->createMock(AuthorizationChecker::class);
@@ -195,16 +195,16 @@ class RateLimitHandlerTest extends TestCase
 
         $cacheItem->expects($this->once())
             ->method('isHit')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $cacheItem->expects($this->once())
             ->method('get')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $cacheItemPool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItemPool->expects($this->once())
             ->method('getItem')
-            ->will($this->returnValue($cacheItem));
+            ->willReturn($cacheItem);
 
         $user = $this->createMock(UserInterface::class);
 
@@ -212,28 +212,28 @@ class RateLimitHandlerTest extends TestCase
 
         $token->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $token->expects($this->once())
             ->method('getUsername')
-            ->will($this->returnValue('myusername'));
+            ->willReturn('myusername');
 
         $token->expects($this->once())
             ->method('isAuthenticated')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $tokenStorage = $this->createMock(TokenStorage::class);
         $tokenStorage->expects($this->any())
             ->method('getToken')
-            ->will($this->returnValue($token));
+            ->willReturn($token);
 
         $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
         $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager->expects($this->once())
             ->method('decide')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-            $authorizationChecker = $this->getMockBuilder(AuthorizationChecker::class)
+        $authorizationChecker = $this->getMockBuilder(AuthorizationChecker::class)
             ->setConstructorArgs([$tokenStorage, $authenticationManager, $accessDecisionManager])
             ->getMock();
 
@@ -271,23 +271,23 @@ class RateLimitHandlerTest extends TestCase
 
         $cacheItem->expects($this->once())
             ->method('isHit')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $cacheItem->expects($this->once())
             ->method('get')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $cacheItemPool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItemPool->expects($this->once())
             ->method('getItem')
-            ->will($this->returnValue($cacheItem));
+            ->willReturn($cacheItem);
 
         $token = $this->createMock(UsernamePasswordToken::class);
 
         $tokenStorage = $this->createMock(TokenStorage::class);
         $tokenStorage->expects($this->any())
             ->method('getToken')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
         $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
@@ -324,17 +324,18 @@ class RateLimitHandlerTest extends TestCase
         $this->assertFalse($rateLimitHandler->isRateLimitExceeded());
     }
 
-    public function testAnnotationDefaultConfiguration() {
+    public function testAnnotationDefaultConfiguration()
+    {
         $cacheItem = $this->createMock(CacheItemInterface::class);
 
         $cacheItem->expects($this->once())
             ->method('isHit')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $cacheItemPool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItemPool->expects($this->once())
             ->method('getItem')
-            ->will($this->returnValue($cacheItem));
+            ->willReturn($cacheItem);
 
         $tokenStorage = $this->createMock(TokenStorage::class);
         $authorizationChecker = $this->createMock(AuthorizationChecker::class);
@@ -367,16 +368,16 @@ class RateLimitHandlerTest extends TestCase
 
         $cacheItem->expects($this->once())
             ->method('isHit')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $cacheItem->expects($this->once())
             ->method('get')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $cacheItemPool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItemPool->expects($this->once())
             ->method('getItem')
-            ->will($this->returnValue($cacheItem));
+            ->willReturn($cacheItem);
 
         $user = $this->createMock(UserInterface::class);
 
@@ -384,26 +385,26 @@ class RateLimitHandlerTest extends TestCase
 
         $token->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $token->expects($this->once())
             ->method('getUsername')
-            ->will($this->returnValue('myusername'));
+            ->willReturn('myusername');
 
         $token->expects($this->once())
             ->method('isAuthenticated')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $tokenStorage = $this->createMock(TokenStorage::class);
         $tokenStorage->expects($this->any())
             ->method('getToken')
-            ->will($this->returnValue($token));
+            ->willReturn($token);
 
         $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
         $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager->expects($this->once())
             ->method('decide')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $authorizationChecker = $this->getMockBuilder(AuthorizationChecker::class)
             ->setConstructorArgs([$tokenStorage, $authenticationManager, $accessDecisionManager])
@@ -438,6 +439,4 @@ class RateLimitHandlerTest extends TestCase
 
         $this->assertFalse($rateLimitHandler->isRateLimitExceeded());
     }
-
-
 }
