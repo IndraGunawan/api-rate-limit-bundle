@@ -123,7 +123,7 @@ class RateLimitHandler
      * @throws \Psr\Cache\InvalidArgumentException
      * @throws \ReflectionException
      */
-     public function handle(Request $request)
+    public function handle(Request $request)
     {
         $annotationReader = new AnnotationReader();
         /** @var ApiRateLimit $annotation */
@@ -137,7 +137,7 @@ class RateLimitHandler
             if ((
                     !\in_array($request->getMethod(), array_map('strtoupper', $annotation->methods), true)
                     &&
-                    !\in_array($request->attributes->get('_api_item_operation_name'),array_map('strtolower', $annotation->methods),true)
+                    !\in_array($request->attributes->get('_api_item_operation_name'), array_map('strtolower', $annotation->methods), true)
                 )
                 && !empty($annotation->methods)
             ) {

@@ -24,12 +24,12 @@ class HeaderModificationListenerTest extends TestCase
 {
     private $kernel;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->kernel = $this->createMock(HttpKernelInterface::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->kernel = null;
     }
