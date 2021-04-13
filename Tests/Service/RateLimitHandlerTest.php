@@ -14,6 +14,7 @@ namespace Indragunawan\ApiRateLimitBundle\Tests\Service;
 use Indragunawan\ApiRateLimitBundle\Service\RateLimitHandler;
 use Indragunawan\ApiRateLimitBundle\Tests\Fixtures\Entity\DisableRateLimit;
 use Indragunawan\ApiRateLimitBundle\Tests\Fixtures\Entity\EnableRateLimit;
+use Indragunawan\ApiRateLimitBundle\Tests\Fixtures\Entity\EnableRateLimitPHP8;
 use Indragunawan\ApiRateLimitBundle\Tests\Fixtures\Entity\ThrottleConfigured;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
@@ -282,8 +283,6 @@ class RateLimitHandlerTest extends TestCase
             ->method('getItem')
             ->willReturn($cacheItem);
 
-        $token = $this->createMock(UsernamePasswordToken::class);
-
         $tokenStorage = $this->createMock(TokenStorage::class);
         $tokenStorage->expects($this->any())
             ->method('getToken')
@@ -438,5 +437,46 @@ class RateLimitHandlerTest extends TestCase
         ], $rateLimitHandler->getRateLimitInfo());
 
         $this->assertFalse($rateLimitHandler->isRateLimitExceeded());
+    }
+
+    /**
+     * @requires PHP 8.0
+     */
+    public function testEnabledApiRateLimitPHP8()
+    {
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+
+        $cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(false);
+
+        $cacheItemPool = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItemPool->expects($this->once())
+            ->method('getItem')
+            ->willReturn($cacheItem);
+
+        $tokenStorage = $this->createMock(TokenStorage::class);
+        $authorizationChecker = $this->createMock(AuthorizationChecker::class);
+
+        $throttleConfig = [
+            'default' => [
+                'limit' => 60,
+                'period' => 60,
+            ],
+            'roles' => [],
+        ];
+
+        $request = Request::create('/api/me');
+        $request->attributes->set('_api_resource_class', EnableRateLimitPHP8::class);
+
+        $rateLimitHandler = new RateLimitHandler($cacheItemPool, $tokenStorage, $authorizationChecker, $throttleConfig);
+        $rateLimitHandler->handle($request);
+
+        $this->assertTrue($rateLimitHandler->isEnabled());
+        $this->assertSame([
+            'limit' => 60,
+            'remaining' => 59,
+            'reset' => gmdate('U') + 60,
+        ], $rateLimitHandler->getRateLimitInfo());
     }
 }

@@ -3,3 +3,4 @@
 /.gitignore export-ignore
 /.github export-ignore
 /.scrutinizer.yml export-ignore
+/Resources/doc export-ignore

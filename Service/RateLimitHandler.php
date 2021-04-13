@@ -14,7 +14,6 @@ namespace Indragunawan\ApiRateLimitBundle\Service;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Indragunawan\ApiRateLimitBundle\Annotation\ApiRateLimit;
 use Psr\Cache\CacheItemPoolInterface;
-use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -125,12 +124,14 @@ class RateLimitHandler
      */
     public function handle(Request $request)
     {
-        $annotationReader = new AnnotationReader();
-        /** @var ApiRateLimit $annotation */
-        $annotation = $annotationReader->getClassAnnotation(
-            new ReflectionClass($request->attributes->get('_api_resource_class')),
-            ApiRateLimit::class
-        );
+        $reflectionClass = new \ReflectionClass($request->attributes->get('_api_resource_class'));
+        if (\PHP_VERSION_ID >= 80000 && $attributes = $reflectionClass->getAttributes(ApiRateLimit::class)) {
+            $annotation = $attributes[0]->newInstance();
+        } else {
+            $annotationReader = new AnnotationReader();
+            /** @var ApiRateLimit $annotation */
+            $annotation = $annotationReader->getClassAnnotation($reflectionClass, ApiRateLimit::class);
+        }
 
         if (null !== $annotation) {
             $this->enabled = $annotation->enabled;
