@@ -101,7 +101,7 @@ Configuration per resource
 -------------------------------
 
 If you wish to configure the rate limits differently on some resources, you can use the `ApiRateLimit` annotation and set the `throttle` property in the same way you do in your main configuration.
-You can define a rate limits only for some specific methods using `methods` property (by default `null` to cover all the different methods).
+You can define a rate limits only for some specific methods using `methods` property (by default `null` to cover all the different methods). You may also use api operation names in your list of methods.
 You can also choose to enable or disable rate limiting by using the `enabled` property.
 
 ```php
