@@ -17,6 +17,7 @@ namespace Indragunawan\ApiRateLimitBundle\Annotation;
  *
  * @author Indra Gunawan <hello@indra.my.id>
  */
+#[\Attribute(\Attribute::TARGET_CLASS)]
 final class ApiRateLimit
 {
     /**
