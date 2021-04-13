@@ -13,7 +13,6 @@ namespace Indragunawan\ApiRateLimitBundle\Tests\EventListener;
 
 use Indragunawan\ApiRateLimitBundle\EventListener\HeaderModificationListener;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,8 +22,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class HeaderModificationListenerTest extends TestCase
 {
-    use ProphecyTrait;
-
     private $kernel;
 
     protected function setUp(): void
