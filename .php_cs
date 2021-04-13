@@ -28,7 +28,7 @@ return PhpCsFixer\Config::create()
         'psr4' => true,
         'strict_comparison' => true,
         'strict_param' => true,
-        'lowercase_constants' => true,
+        'constant_case' => true,
         'lowercase_keywords' => true,
         'visibility_required' => true,
     ])
