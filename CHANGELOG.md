@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-master
+v0.5.0
 ------
 
 * Allow PHP8, switch to Github action (#18)
