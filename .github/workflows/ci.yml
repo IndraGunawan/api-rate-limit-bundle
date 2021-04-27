@@ -31,14 +31,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
         with:
           coverage: xdebug2
-          extensions: "intl"
-          ini-values: "memory_limit=-1"
-          php-version: "${{ matrix.php }}"
-          tools: composer, phpunit
+          extensions: intl
+          ini-values: memory_limit=-1
+          php-version: ${{ matrix.php }}
+          tools: composer
 
       - name: Cache Composer packages
         uses: actions/cache@v1
@@ -50,27 +50,32 @@ jobs:
             composer-
         continue-on-error: true
 
+      - name: Setup PHPUNIT
+        run: |
+          mkdir --parents tools/phpunit
+          composer require --ansi --no-interaction --no-progress --prefer-dist --working-dir=tools/phpunit phpunit/phpunit
+
       - name: Setup coverage
         if: matrix.coverage
         run: |
           wget https://scrutinizer-ci.com/ocular.phar -O $OCULAR_BIN
           chmod +x $OCULAR_BIN
 
-      - name: "Install dependencies"
-        if: 'matrix.lowest'
+      - name: Install dependencies
+        if: matrix.lowest
         run: composer update --ansi --no-interaction --no-progress --prefer-dist --prefer-lowest
 
-      - name: "Install dependencies"
+      - name: Install dependencies
         if: '!matrix.lowest'
         run: composer update --ansi --no-interaction --no-progress --prefer-dist
 
       - name: Run tests
         if: '!matrix.coverage'
-        run: phpunit --verbose --stop-on-failure --coverage-text
+        run: php tools/phpunit/vendor/bin/phpunit --verbose --stop-on-failure --coverage-text
 
       - name: Run tests
         if: matrix.coverage
-        run: phpunit --verbose --stop-on-failure --coverage-text --coverage-clover=coverage.xml
+        run: php tools/phpunit/vendor/bin/phpunit --verbose --stop-on-failure --coverage-text --coverage-clover=coverage.xml
 
       - name: Upload coverage
         if: matrix.coverage
