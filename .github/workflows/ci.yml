@@ -40,15 +40,16 @@ jobs:
           php-version: ${{ matrix.php }}
           tools: composer
 
-      - name: Cache Composer packages
-        uses: actions/cache@v1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
         with:
-          path: ~/.composer/cache
-          key: composer-php${{ matrix.php }}-${{ github.sha }}
-          restore-keys: |
-            composer-php${{ matrix.php }}-
-            composer-
-        continue-on-error: true
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
 
       - name: Setup PHPUNIT
         run: |
