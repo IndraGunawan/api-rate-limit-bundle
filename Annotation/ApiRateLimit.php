@@ -17,8 +17,23 @@ namespace Indragunawan\ApiRateLimitBundle\Annotation;
  *
  * @author Indra Gunawan <hello@indra.my.id>
  */
+#[\Attribute(\Attribute::TARGET_CLASS)]
 final class ApiRateLimit
 {
+    public function __construct($enabled = true, array $throttle = [], array $methods = [])
+    {
+        if (\is_array($enabled)) {
+            // supports doctrine annotations
+            foreach ($enabled as $key => $value) {
+                $this->$key = $value;
+            }
+        } else {
+            $this->enabled = $enabled;
+            $this->throttle = $throttle;
+            $this->methods = $methods;
+        }
+    }
+
     /**
      * @var bool
      */

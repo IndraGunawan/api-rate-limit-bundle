@@ -14,7 +14,7 @@ namespace Indragunawan\ApiRateLimitBundle\Tests\Fixtures\Entity;
 use Indragunawan\ApiRateLimitBundle\Annotation\ApiRateLimit;
 
 /**
- * This is a dummy entity. Remove it!
+ * This is a dummy entity.
  *
  * @ApiRateLimit(enabled=false)
  */

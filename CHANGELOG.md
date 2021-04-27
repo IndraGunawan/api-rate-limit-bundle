@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+v0.5.0
+------
+
+* Allow PHP8, switch to Github action (#18)
+* Enable rate limiting based on API Operations annotations (#17)
+
 v0.4.0
 ------
 

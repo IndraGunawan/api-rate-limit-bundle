@@ -14,11 +14,10 @@ namespace Indragunawan\ApiRateLimitBundle\Tests\Fixtures\Entity;
 use Indragunawan\ApiRateLimitBundle\Annotation\ApiRateLimit;
 
 /**
- * This is a dummy entity.
- *
- * @ApiRateLimit(enabled=true)
+ * This is a dummy entity PHP8.
  */
-class EnableRateLimit
+#[ApiRateLimit(enabled: true)]
+class EnableRateLimitPHP8
 {
     /**
      * @var int The entity Id

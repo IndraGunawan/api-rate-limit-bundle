@@ -1,0 +1,51 @@
+name: "PHP CS Fixer"
+
+on:
+  push:
+  # pull_request:
+
+env:
+  COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
+
+jobs:
+  php-cs-fixer:
+    name: PHP-CS-Fixer (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php:
+          - '7.4'
+      fail-fast: false
+    timeout-minutes: 5
+    env:
+      PHP_CS_FIXER_FUTURE_MODE: '1'
+      PHP_CS_FIXER_VERSION: 'v2.18.5'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          extensions: "intl"
+          ini-values: "memory_limit=-1"
+          php-version: "${{ matrix.php }}"
+          tools: php-cs-fixer:${PHP_CS_FIXER_VERSION}, composer
+
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-php-cs-fixer-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-php-cs-fixer-
+            composer-php${{ matrix.php }}-
+            composer-
+        continue-on-error: true
+
+      - name: "Install dependencies"
+        run: composer install --ansi --no-interaction --no-progress --no-suggest --prefer-dist
+
+      - name: Run PHP-CS-Fixer fix
+        run: php-cs-fixer fix --dry-run --diff --ansi

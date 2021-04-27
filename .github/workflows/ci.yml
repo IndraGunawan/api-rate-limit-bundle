@@ -1,0 +1,83 @@
+name: "Continuous Integration"
+
+on:
+  push:
+  pull_request:
+
+env:
+  COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
+  SHELL_VERBOSITY: 1
+  OCULAR_BIN: ocular.phar
+
+jobs:
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php:
+          - '7.1'
+          - '7.4'
+          - '8.0'
+        include:
+          - php: '7.1'
+            lowest: true
+          - php: '7.4'
+            coverage: true
+          - php: '8.0'
+      fail-fast: false
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: xdebug2
+          extensions: intl
+          ini-values: memory_limit=-1
+          php-version: ${{ matrix.php }}
+          tools: composer
+
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Setup PHPUNIT
+        run: |
+          mkdir --parents external-tools/phpunit
+          composer require --ansi --no-interaction --no-progress --prefer-dist --working-dir=external-tools/phpunit phpunit/phpunit
+
+      - name: Setup coverage
+        if: matrix.coverage
+        run: |
+          wget https://scrutinizer-ci.com/ocular.phar -O $OCULAR_BIN
+          chmod +x $OCULAR_BIN
+
+      - name: Install dependencies
+        if: matrix.lowest
+        run: composer update --ansi --no-interaction --no-progress --prefer-dist --prefer-lowest
+
+      - name: Install dependencies
+        if: '!matrix.lowest'
+        run: composer update --ansi --no-interaction --no-progress --prefer-dist
+
+      - name: Run tests
+        if: '!matrix.coverage'
+        run: php external-tools/phpunit/vendor/bin/phpunit --verbose --stop-on-failure --coverage-text
+
+      - name: Run tests
+        if: matrix.coverage
+        run: php external-tools/phpunit/vendor/bin/phpunit --verbose --stop-on-failure --coverage-text --coverage-clover=coverage.xml
+
+      - name: Upload coverage
+        if: matrix.coverage
+        run: php $OCULAR_BIN code-coverage:upload --format=php-clover coverage.xml
