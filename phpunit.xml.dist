@@ -18,6 +18,7 @@
                 <directory>./Resources</directory>
                 <directory>./Tests</directory>
                 <directory>./vendor</directory>
+                <directory>./external-tools</directory>
             </exclude>
         </whitelist>
     </filter>

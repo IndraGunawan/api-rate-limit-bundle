@@ -52,8 +52,8 @@ jobs:
 
       - name: Setup PHPUNIT
         run: |
-          mkdir --parents tools/phpunit
-          composer require --ansi --no-interaction --no-progress --prefer-dist --working-dir=tools/phpunit phpunit/phpunit
+          mkdir --parents external-tools/phpunit
+          composer require --ansi --no-interaction --no-progress --prefer-dist --working-dir=external-tools/phpunit phpunit/phpunit
 
       - name: Setup coverage
         if: matrix.coverage
@@ -71,11 +71,11 @@ jobs:
 
       - name: Run tests
         if: '!matrix.coverage'
-        run: php tools/phpunit/vendor/bin/phpunit --verbose --stop-on-failure --coverage-text
+        run: php external-tools/phpunit/vendor/bin/phpunit --verbose --stop-on-failure --coverage-text
 
       - name: Run tests
         if: matrix.coverage
-        run: php tools/phpunit/vendor/bin/phpunit --verbose --stop-on-failure --coverage-text --coverage-clover=coverage.xml
+        run: php external-tools/phpunit/vendor/bin/phpunit --verbose --stop-on-failure --coverage-text --coverage-clover=coverage.xml
 
       - name: Upload coverage
         if: matrix.coverage
