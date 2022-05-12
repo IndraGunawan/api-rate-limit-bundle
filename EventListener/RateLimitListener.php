@@ -57,16 +57,24 @@ class RateLimitListener
         }
 
         // only process on master request
-        if (!$event->isMasterRequest()) {
+        if (method_exists($event, 'isMasterRequest') && !$event->isMasterRequest()) {
+            return;
+        }
+
+        if (!$event->isMainRequest()) {
             return;
         }
 
         $request = $event->getRequest();
-        if (!$request->attributes->has('_api_resource_class')) {
+        if (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_graphql')) {
             return;
         }
 
-        $this->rateLimitHandler->handle($request);
+        if ($request->attributes->has('_api_resource_class')) {
+            $this->rateLimitHandler->handle($request);
+        } else {
+            $this->rateLimitHandler->handleGraphQL($request);
+        }
 
         if ($this->rateLimitHandler->isEnabled()) {
             $request->attributes->set('_api_rate_limit_info', $this->rateLimitHandler->getRateLimitInfo());
