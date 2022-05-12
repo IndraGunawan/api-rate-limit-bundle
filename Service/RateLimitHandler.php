@@ -156,6 +156,17 @@ class RateLimitHandler
         }
     }
 
+    public function handleGraphQL(Request $request)
+    {
+        $annotation = new ApiRateLimit();
+
+        list($key, $limit, $period) = $this->getThrottle($request, $annotation);
+
+        if ($this->enabled) {
+            $this->decreaseRateLimitRemaining($key, $limit, $period);
+        }
+    }
+
     /**
      * @throws \Psr\Cache\InvalidArgumentException
      */
